@@ -154,12 +154,17 @@ namespace RG35XX.Linux
 
                 if (BitsPerPixel == 32)
                 {
-                    // Precompute offsets
-                    int blueOffset = (int)_varInfo.blue_offset / 8;
-                    int greenOffset = (int)_varInfo.green_offset / 8;
-                    int redOffset = (int)_varInfo.red_offset / 8;
-                    int transpOffset = (int)_varInfo.transp_offset / 8;
-                    bool hasTransparency = _varInfo.transp_length > 0;
+                    // Precompute component offsets and lengths
+                    int blueOffset = (int)_varInfo.blue_offset;
+                    int greenOffset = (int)_varInfo.green_offset;
+                    int redOffset = (int)_varInfo.red_offset;
+                    int transpOffset = (int)_varInfo.transp_offset;
+                    int blueLength = (int)_varInfo.blue_length;
+                    int greenLength = (int)_varInfo.green_length;
+                    int redLength = (int)_varInfo.red_length;
+                    int transpLength = (int)_varInfo.transp_length;
+
+                    bool hasTransparency = transpLength > 0;
 
                     for (int py = 0; py < bitmapHeight; py++)
                     {
@@ -183,14 +188,21 @@ namespace RG35XX.Linux
                             Color pixel = pixels[pixelRowStartIndex + px];
                             int fbOffset = fbRowOffset + (fbX * bytesPerPixel);
 
-                            fbPtr[fbOffset + blueOffset] = pixel.B;
-                            fbPtr[fbOffset + greenOffset] = pixel.G;
-                            fbPtr[fbOffset + redOffset] = pixel.R;
+                            // Construct the 32-bit pixel value
+                            uint pixelValue = 0;
+
+                            // Note: Ensure that the color component values are within the expected range
+                            pixelValue |= ((uint)(pixel.B) & 0xFF) >> (8 - blueLength) << blueOffset;
+                            pixelValue |= ((uint)(pixel.G) & 0xFF) >> (8 - greenLength) << greenOffset;
+                            pixelValue |= ((uint)(pixel.R) & 0xFF) >> (8 - redLength) << redOffset;
 
                             if (hasTransparency)
                             {
-                                fbPtr[fbOffset + transpOffset] = pixel.A;
+                                pixelValue |= ((uint)(pixel.A) & 0xFF) >> (8 - transpLength) << transpOffset;
                             }
+
+                            // Write the 32-bit pixel value directly
+                            *((uint*)(fbPtr + fbOffset)) = pixelValue;
                         }
                     }
                 }
