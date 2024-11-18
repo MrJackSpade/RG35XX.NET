@@ -42,7 +42,7 @@
                 throw new ArgumentException("Search string does not exist in source string", nameof(toStr));
             }
 
-            string result = source[..];
+            string result = source[..index];
             return result;
         }
     }
