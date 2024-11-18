@@ -6,6 +6,7 @@ namespace RG35XX.Libraries
     public class GamePadReader : IGamePadReader
     {
         private readonly IGamePadReader _gamePadReader;
+
         public GamePadReader()
         {
 #if DEBUG
@@ -14,6 +15,11 @@ namespace RG35XX.Libraries
 #else
             _gamePadReader = new RG35XX.Linux.LinuxGamePadReader();
 #endif
+        }
+
+        public void ClearBuffer()
+        {
+            _gamePadReader.ClearBuffer();
         }
 
         public void Initialize(string devicePath = "/dev/input/js0")

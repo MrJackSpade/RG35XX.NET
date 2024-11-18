@@ -1,7 +1,10 @@
-﻿using RG35XX.Core.Drawing;
-using RG35XX.Core.Interfaces;
+﻿using RG35XX.Core.Interfaces;
 using RG35XX.Windows.Forms;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
+using Bitmap = RG35XX.Core.Drawing.Bitmap;
+using Color = RG35XX.Core.Drawing.Color;
 
 namespace RG35XX.Windows
 {
@@ -12,6 +15,8 @@ namespace RG35XX.Windows
         private Bitmap? _displayed;
 
         private Renderer? _renderer;
+
+        private readonly object _rendererLock = new();
 
         private bool _shouldExit;
 
@@ -49,15 +54,7 @@ namespace RG35XX.Windows
                 throw new System.InvalidOperationException();
             }
 
-            for (int by = 0; by < bitmap.Height; by++)
-            {
-                for (int bx = 0; bx < bitmap.Width; bx++)
-                {
-                    Color pixel = bitmap.GetPixel(bx, by);
-
-                    _displayed.SetPixel(x + bx, y + by, pixel);
-                }
-            }
+            _displayed.Draw(bitmap, x, y);
 
             this.Dump();
         }
@@ -66,7 +63,7 @@ namespace RG35XX.Windows
         {
             if (_displayed == null)
             {
-                throw new System.InvalidOperationException();
+                throw new InvalidOperationException();
             }
 
             if (_renderer == null)
@@ -74,21 +71,54 @@ namespace RG35XX.Windows
                 throw new InvalidOperationException();
             }
 
-            System.Drawing.Bitmap bmp = new(_displayed.Width, _displayed.Height);
+            int width = _displayed.Width;
+            int height = _displayed.Height;
+            Color[] pixels = _displayed.Pixels; // Ensure this is your Color[] array with correct dimensions
 
-            for (int y = 0; y < _displayed.Height; y++)
+            // Create a new bitmap with the same dimensions and pixel format
+            System.Drawing.Bitmap bmp = new(width, height, PixelFormat.Format32bppArgb);
+
+            // Lock the bitmap's bits
+            BitmapData bmpData = bmp.LockBits(
+                new Rectangle(0, 0, width, height),
+                ImageLockMode.WriteOnly,
+                bmp.PixelFormat);
+
+            int bytesPerPixel = 4; // For Format32bppArgb
+            int srcStride = width * bytesPerPixel;
+            int dstStride = bmpData.Stride;
+
+            unsafe
             {
-                for (int x = 0; x < _displayed.Width; x++)
-                {
-                    Color pixel = _displayed.GetPixel(x, y);
+                byte* dstScan0 = (byte*)bmpData.Scan0;
 
-                    bmp.SetPixel(x, y, System.Drawing.Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B));
+                fixed (Color* srcScan0 = pixels)
+                {
+                    byte* srcRow = (byte*)srcScan0;
+                    byte* dstRow = dstScan0;
+
+                    for (int y = 0; y < height; y++)
+                    {
+                        // Copy one scanline at a time
+                        Buffer.MemoryCopy(
+                            source: srcRow,
+                            destination: dstRow,
+                            destinationSizeInBytes: dstStride,
+                            sourceBytesToCopy: srcStride);
+
+                        srcRow += srcStride;
+                        dstRow += dstStride;
+                    }
                 }
             }
 
-            bmp.Save("framebuffer.bmp");
+            // Unlock the bits
+            bmp.UnlockBits(bmpData);
 
-            _renderer.SetImage(bmp);
+            lock (_rendererLock)
+            {
+                _renderer.Invoke(() => _renderer.SetImage(bmp));
+            }
         }
 
         public void Initialize(int width, int height)

@@ -65,21 +65,25 @@
 
         public void Draw(Bitmap source, int offsetX, int offsetY)
         {
-            // For each pixel in source bitmap
-            for (int y = 0; y < source.Height; y++)
-            {
-                for (int x = 0; x < source.Width; x++)
-                {
-                    // Calculate destination coordinates
-                    int destX = x + offsetX;
-                    int destY = y + offsetY;
+            // Determine the area to copy
+            int copyWidth = Math.Min(Width - offsetX, source.Width);
+            int copyHeight = Math.Min(Height - offsetY, source.Height);
 
-                    // Only draw if within bounds of destination bitmap
-                    if (destX >= 0 && destX < Width && destY >= 0 && destY < Height)
-                    {
-                        this.SetPixel(destX, destY, source.GetPixel(x, y));
-                    }
-                }
+            // Return if there's nothing to copy
+            if (copyWidth <= 0 || copyHeight <= 0)
+            {
+                return;
+            }
+
+            // For each row in the area to copy
+            for (int y = 0; y < copyHeight; y++)
+            {
+                // Calculate source and destination indices
+                int sourceIndex = y * source.Width;
+                int destIndex = ((y + offsetY) * Width) + offsetX;
+
+                // Copy a block of pixels from source to destination
+                Array.Copy(source.Pixels, sourceIndex, Pixels, destIndex, copyWidth);
             }
         }
 

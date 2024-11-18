@@ -8,7 +8,7 @@ namespace RG35XX.Libraries
     {
         public Color BackgroundColor;
 
-        public byte Char;
+        public char Char;
 
         public Color ForegroundColor;
     }

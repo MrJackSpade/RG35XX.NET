@@ -1,17 +1,23 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace RG35XX.Core.Drawing
 {
     [DebuggerDisplay("{DisplayName}")]
+    [StructLayout(LayoutKind.Explicit)]
     public struct Color(byte r, byte g, byte b, byte a = 255)
     {
-        public byte A = a;
-
+        [FieldOffset(0)]
         public byte B = b;
 
+        [FieldOffset(1)]
         public byte G = g;
 
+        [FieldOffset(2)]
         public byte R = r;
+
+        [FieldOffset(3)]
+        public byte A = a;
 
         public static Color Black => new(0, 0, 0);
 
