@@ -10,8 +10,6 @@ namespace RG35XX.Core.Interfaces
 
         void Clear();
 
-        bool DiagnoseFramebuffer(string fbDevice = "/dev/fb0");
-
         void Draw(Bitmap bitmap, int x, int y);
 
         void Initialize(int width, int height);

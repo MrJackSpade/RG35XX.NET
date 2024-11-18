@@ -27,11 +27,6 @@ namespace RG35XX.Libraries
             _frameBuffer.Clear();
         }
 
-        public bool DiagnoseFramebuffer(string fbDevice = "/dev/fb0")
-        {
-            return _frameBuffer.DiagnoseFramebuffer(fbDevice);
-        }
-
         public void Draw(Bitmap bitmap, int x, int y)
         {
             _frameBuffer.Draw(bitmap, x, y);

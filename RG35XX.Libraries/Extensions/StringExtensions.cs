@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RG35XX.Libraries.Extensions
+﻿namespace RG35XX.Libraries.Extensions
 {
     public static class StringExtensions
     {
@@ -29,13 +23,26 @@ namespace RG35XX.Libraries.Extensions
 
         public static string From(this string source, string fromStr)
         {
-            string result = source[(source.IndexOf(fromStr) + fromStr.Length)..];
+            int index = source.IndexOf(fromStr);
+            if (index == -1)
+            {
+                throw new ArgumentException("Search string does not exist in source string", nameof(fromStr));
+            }
+
+            string result = source[(index + fromStr.Length)..];
             return result;
         }
 
         public static string To(this string source, string toStr)
         {
-            string result = source[..source.IndexOf(toStr)];
+            int index = source.IndexOf(toStr);
+
+            if (index < 0)
+            {
+                throw new ArgumentException("Search string does not exist in source string", nameof(toStr));
+            }
+
+            string result = source[..];
             return result;
         }
     }

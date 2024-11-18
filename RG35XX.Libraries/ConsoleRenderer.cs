@@ -15,6 +15,8 @@ namespace RG35XX.Libraries
 
         private int _cursorY;
 
+        public bool AutoFlush { get; set; } = true;
+
         public FrameBuffer FrameBuffer { get; } = new();
 
         public int Height { get; private set; }
@@ -37,7 +39,7 @@ namespace RG35XX.Libraries
 
             if (flush)
             {
-                this.Dump();
+                this.Flush();
             }
         }
 
@@ -98,7 +100,10 @@ namespace RG35XX.Libraries
                 }
             }
 
-            this.Dump();
+            if (AutoFlush)
+            {
+                this.Flush();
+            }
         }
 
         public void WriteLine(string text = "")
@@ -111,7 +116,7 @@ namespace RG35XX.Libraries
             this.Write(text + '\n', foreground, background);
         }
 
-        private void Dump()
+        public void Flush()
         {
             Bitmap toDraw = new(Width * _font.Width, Height * _font.Height);
 

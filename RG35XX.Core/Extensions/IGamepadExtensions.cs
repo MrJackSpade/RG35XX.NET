@@ -10,13 +10,12 @@ namespace RG35XX.Core.Extensions
 {
     public static class IGamepadExtensions
     {
-        public static GamepadKey WaitForInput(this IGamePadReader reader, int delayMs = 100)
+        public static GamepadKey WaitForInput(this IGamePadReader reader)
         {
             GamepadKey result = GamepadKey.None;
 
             while (result == GamepadKey.None)
             {
-                Thread.Sleep(delayMs);
                 result = reader.ReadInput();
             }
 
