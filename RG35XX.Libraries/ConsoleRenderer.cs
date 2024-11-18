@@ -43,6 +43,48 @@ namespace RG35XX.Libraries
             }
         }
 
+        public void ClearLine(bool flush = true)
+        {
+            _cursorX = 0;
+
+            for (int x = 0; x < Width; x++)
+            {
+                _buffer[_cursorY, x] = new CharData() { Char = ' ', BackgroundColor = Color.Black, ForegroundColor = Color.White };
+            }
+
+            if (flush)
+            {
+                this.Flush();
+            }
+        }
+
+        public void Flush()
+        {
+            Bitmap toDraw = new(Width * _font.Width, Height * _font.Height);
+
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    CharData charData = _buffer[y, x];
+
+                    Bitmap? charMap = _font.GetCharacterMap(charData.Char, charData.ForegroundColor, charData.BackgroundColor);
+
+                    if (charMap != null)
+                    {
+                        toDraw.Draw(charMap, x * _font.Width, y * _font.Height);
+                    }
+                    else
+                    {
+                        Bitmap blankChar = new(_font.Width, _font.Height, charData.BackgroundColor);
+                        toDraw.Draw(blankChar, x * _font.Width, y * _font.Height);
+                    }
+                }
+            }
+
+            FrameBuffer.Draw(toDraw, 0, 0);
+        }
+
         public void Initialize(int width, int height)
         {
             FrameBuffer.Initialize(width, height);
@@ -114,33 +156,6 @@ namespace RG35XX.Libraries
         public void WriteLine(string? text, Color foreground, Color background)
         {
             this.Write(text + '\n', foreground, background);
-        }
-
-        public void Flush()
-        {
-            Bitmap toDraw = new(Width * _font.Width, Height * _font.Height);
-
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    CharData charData = _buffer[y, x];
-
-                    Bitmap? charMap = _font.GetCharacterMap(charData.Char, charData.ForegroundColor, charData.BackgroundColor);
-
-                    if (charMap != null)
-                    {
-                        toDraw.Draw(charMap, x * _font.Width, y * _font.Height);
-                    }
-                    else
-                    {
-                        Bitmap blankChar = new(_font.Width, _font.Height, charData.BackgroundColor);
-                        toDraw.Draw(blankChar, x * _font.Width, y * _font.Height);
-                    }
-                }
-            }
-
-            FrameBuffer.Draw(toDraw, 0, 0);
         }
 
         private void ScrollBufferUp()
