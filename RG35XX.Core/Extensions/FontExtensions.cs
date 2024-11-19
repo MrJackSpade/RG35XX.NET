@@ -7,12 +7,17 @@ namespace RG35XX.Core.Extensions
     {
         public static Bitmap GetCharacterMap(this IFont font, char index, Color foreground, Color background)
         {
-            if(!font.Data.TryGetValue(index, out byte[][]? fullData))
+            if (index == ' ')
+            {
+                return new Bitmap(font.Width, font.Height, background);
+            }
+
+            if (!font.Data.TryGetValue(index, out byte[][]? fullData))
             {
                 return null;
-            } 
+            }
 
-            if(font.Width > 8)
+            if (font.Width > 8)
             {
                 throw new NotImplementedException("Font width > 8 is not implemented");
             }

@@ -12,11 +12,11 @@ namespace RG35XX.Windows
     {
         private readonly ManualResetEvent _formDrawn = new(false);
 
+        private readonly object _rendererLock = new();
+
         private Bitmap? _displayed;
 
         private Renderer? _renderer;
-
-        private readonly object _rendererLock = new();
 
         private bool _shouldExit;
 

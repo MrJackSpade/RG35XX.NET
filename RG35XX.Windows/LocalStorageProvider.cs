@@ -4,9 +4,11 @@ namespace RG35XX.Windows
 {
     public class LocalStorageProvider : IStorageProvider
     {
-        public string MMC => "MMC";
+        public string MMC => Path.Combine(ROOT, "MMC");
 
-        public string SD => "SDCARD";
+        public string ROOT => Directory.GetCurrentDirectory();
+
+        public string SD => Path.Combine(ROOT, "SDCARD");
 
         public void Initialize()
         {

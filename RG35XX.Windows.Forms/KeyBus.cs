@@ -7,6 +7,11 @@ namespace RG35XX.Windows.Forms
     {
         private static readonly ConcurrentQueue<GamepadKey> _keys = new();
 
+        public static void ClearBuffer()
+        {
+            _keys.Clear();
+        }
+
         public static void OnKeyDown(KeyEventArgs e)
         {
             GamepadKey key = GamepadKey.None;
@@ -564,11 +569,6 @@ namespace RG35XX.Windows.Forms
             {
                 _keys.Enqueue(key);
             }
-        }
-
-        public static void ClearBuffer()
-        {
-            _keys.Clear();
         }
 
         public static void OnKeyUp(KeyEventArgs e)
@@ -1130,7 +1130,7 @@ namespace RG35XX.Windows.Forms
         {
             if (_keys.Count > 0)
             {
-                if(_keys.TryDequeue(out GamepadKey key))
+                if (_keys.TryDequeue(out GamepadKey key))
                 {
                     return key;
                 }

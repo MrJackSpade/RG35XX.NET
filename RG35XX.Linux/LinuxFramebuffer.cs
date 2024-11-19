@@ -7,7 +7,6 @@ namespace RG35XX.Linux
 {
     public partial class LinuxFramebuffer : IDisposable, IFrameBuffer
     {
-
         private const uint FBIOGET_FSCREENINFO = 0x4602;
 
         private const uint FBIOGET_VSCREENINFO = 0x4600;
@@ -16,9 +15,9 @@ namespace RG35XX.Linux
 
         private readonly SafeFileHandle _fbHandle;
 
-        private fb_fix_screeninfo _fixInfo;
-
         private readonly int _frameBufferSize;
+
+        private fb_fix_screeninfo _fixInfo;
 
         private nint _mappedMemory;
 
@@ -192,17 +191,17 @@ namespace RG35XX.Linux
                             uint pixelValue = 0;
 
                             // Note: Ensure that the color component values are within the expected range
-                            pixelValue |= ((uint)(pixel.B) & 0xFF) >> (8 - blueLength) << blueOffset;
-                            pixelValue |= ((uint)(pixel.G) & 0xFF) >> (8 - greenLength) << greenOffset;
-                            pixelValue |= ((uint)(pixel.R) & 0xFF) >> (8 - redLength) << redOffset;
+                            pixelValue |= ((uint)pixel.B & 0xFF) >> (8 - blueLength) << blueOffset;
+                            pixelValue |= ((uint)pixel.G & 0xFF) >> (8 - greenLength) << greenOffset;
+                            pixelValue |= ((uint)pixel.R & 0xFF) >> (8 - redLength) << redOffset;
 
                             if (hasTransparency)
                             {
-                                pixelValue |= ((uint)(pixel.A) & 0xFF) >> (8 - transpLength) << transpOffset;
+                                pixelValue |= ((uint)pixel.A & 0xFF) >> (8 - transpLength) << transpOffset;
                             }
 
                             // Write the 32-bit pixel value directly
-                            *((uint*)(fbPtr + fbOffset)) = pixelValue;
+                            *(uint*)(fbPtr + fbOffset) = pixelValue;
                         }
                     }
                 }
@@ -244,6 +243,10 @@ namespace RG35XX.Linux
                 }
                 // Add handlers for other color depths if needed
             }
+        }
+
+        public void Initialize(int width, int height)
+        {
         }
 
         [DllImport("libc", SetLastError = true)]
@@ -294,11 +297,6 @@ namespace RG35XX.Linux
             {
                 Console.WriteLine($"VSync wait exception: {ex.Message}");
             }
-        }
-
-        public void Initialize(int width, int height)
-        {
-
         }
     }
 }

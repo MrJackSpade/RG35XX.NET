@@ -1,9 +1,9 @@
-﻿
-namespace RG35XX.Windows.Forms
+﻿namespace RG35XX.Windows.Forms
 {
     public partial class Renderer : Form
     {
         private PictureBox? pictureBox;
+
         public Renderer()
         {
             this.InitializeComponent();
@@ -11,10 +11,6 @@ namespace RG35XX.Windows.Forms
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            System.Environment.Exit(0);
-        }
         public void Initialize(int width, int height)
         {
             ClientSize = new Size()
@@ -55,6 +51,11 @@ namespace RG35XX.Windows.Forms
             pictureBox.Image?.Dispose();
 
             pictureBox.Image = bitmap;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            System.Environment.Exit(0);
         }
 
         private void Renderer_KeyDown(object sender, KeyEventArgs e)

@@ -87,6 +87,125 @@
             }
         }
 
+        public void DrawCircle(int centerX, int centerY, int radius, Color color, FillStyle fillStyle)
+        {
+            if (fillStyle == FillStyle.Fill)
+            {
+                // Filled circle
+                for (int y = -radius; y <= radius; y++)
+                {
+                    for (int x = -radius; x <= radius; x++)
+                    {
+                        if ((x * x) + (y * y) <= radius * radius)
+                        {
+                            this.SetPixel(centerX + x, centerY + y, color);
+                        }
+                    }
+                }
+            }
+            else // Stroke
+            {
+                // Outline circle using Midpoint Circle Algorithm
+                int x = radius;
+                int y = 0;
+                int decisionOver2 = 1 - x;
+
+                while (y <= x)
+                {
+                    this.SetPixel(x + centerX, y + centerY, color);
+                    this.SetPixel(y + centerX, x + centerY, color);
+                    this.SetPixel(-x + centerX, y + centerY, color);
+                    this.SetPixel(-y + centerX, x + centerY, color);
+                    this.SetPixel(-x + centerX, -y + centerY, color);
+                    this.SetPixel(-y + centerX, -x + centerY, color);
+                    this.SetPixel(x + centerX, -y + centerY, color);
+                    this.SetPixel(y + centerX, -x + centerY, color);
+                    y++;
+                    if (decisionOver2 <= 0)
+                    {
+                        decisionOver2 += (2 * y) + 1;
+                    }
+                    else
+                    {
+                        x--;
+                        decisionOver2 += (2 * (y - x)) + 1;
+                    }
+                }
+            }
+        }
+
+        public void DrawLine(int x0, int y0, int x1, int y1, Color color, int thickness = 1)
+        {
+            // Use Bresenham's line algorithm
+            int dx = Math.Abs(x1 - x0);
+            int sx = x0 < x1 ? 1 : -1;
+            int dy = -Math.Abs(y1 - y0);
+            int sy = y0 < y1 ? 1 : -1;
+            int err = dx + dy;
+
+            while (true)
+            {
+                if (thickness == 1)
+                {
+                    this.SetPixel(x0, y0, color);
+                }
+                else
+                {
+                    // Draw a filled circle at the current point to simulate thickness
+                    this.DrawCircle(x0, y0, thickness / 2, color, FillStyle.Fill);
+                }
+
+                if (x0 == x1 && y0 == y1)
+                {
+                    break;
+                }
+
+                int e2 = 2 * err;
+                if (e2 >= dy)
+                {
+                    err += dy;
+                    x0 += sx;
+                }
+
+                if (e2 <= dx)
+                {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        public void DrawRectangle(int x, int y, int width, int height, Color color, FillStyle fillStyle)
+        {
+            if (fillStyle == FillStyle.Fill)
+            {
+                // Filled rectangle
+                for (int dy = 0; dy < height; dy++)
+                {
+                    for (int dx = 0; dx < width; dx++)
+                    {
+                        this.SetPixel(x + dx, y + dy, color);
+                    }
+                }
+            }
+            else // Stroke
+            {
+                // Top and bottom edges
+                for (int dx = 0; dx < width; dx++)
+                {
+                    this.SetPixel(x + dx, y, color); // Top edge
+                    this.SetPixel(x + dx, y + height - 1, color); // Bottom edge
+                }
+
+                // Left and right edges
+                for (int dy = 0; dy < height; dy++)
+                {
+                    this.SetPixel(x, y + dy, color); // Left edge
+                    this.SetPixel(x + width - 1, y + dy, color); // Right edge
+                }
+            }
+        }
+
         public Color GetPixel(int x, int y)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height)

@@ -1,9 +1,4 @@
 ﻿using RG35XX.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RG35XX.Libraries
 {
@@ -14,6 +9,8 @@ namespace RG35XX.Libraries
         public string MMC => _storageProvider.MMC;
 
         public string SD => _storageProvider.SD;
+
+        public string ROOT => _storageProvider.ROOT;
 
         public StorageProvider()
         {

@@ -35,6 +35,62 @@ namespace RG35XX.Core.Drawing
 
         public static Color Yellow => new(255, 255, 0);
 
+        public static Color Transparent => new(0, 0, 0, 0);
+
+        public static Color FromArgb(int argb)
+        {
+            return new Color((byte)((argb >> 16) & 0xFF), (byte)((argb >> 8) & 0xFF), (byte)(argb & 0xFF), (byte)((argb >> 24) & 0xFF));
+        }
+
+        public static Color FromRgb(int r, int g, int b)
+        {
+            return new Color((byte)r, (byte)g, (byte)b);
+        }
+
+        public static Color FromArgb(int a, int r, int g, int b)
+        {
+            return new Color((byte)r, (byte)g, (byte)b, (byte)a);
+        }
+
+        public static Color FromArgb(float a, float r, float g, float b)
+        {
+            return new Color((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), (byte)(a * 255));
+        }
+
+        public static Color FromRgb(float r, float g, float b)
+        {
+            return new Color((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
+        }
+
+        public static Color FromHex(string hex)
+        {
+            if (hex.StartsWith('#'))
+            {
+                hex = hex[1..];
+            }
+
+            if (hex.Length == 6)
+            {
+                return new Color(
+                    byte.Parse(hex[..2], System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber)
+                );
+            }
+
+            if (hex.Length == 8)
+            {
+                return new Color(
+                    byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(hex.Substring(6, 2), System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(hex[..2], System.Globalization.NumberStyles.HexNumber)
+                );
+            }
+
+            throw new System.Exception("Invalid hex string");
+        }
+
         public readonly string DisplayName
         {
             get

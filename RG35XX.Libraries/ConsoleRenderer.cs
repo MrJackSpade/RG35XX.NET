@@ -93,6 +93,12 @@ namespace RG35XX.Libraries
             this.Clear(false);
         }
 
+        public void SetCursorPosition(int x, int y)
+        {
+            _cursorX = x;
+            _cursorY = y;
+        }
+
         public void Write(string text)
         {
             this.Write(text, Color.White, Color.Black);
@@ -107,16 +113,22 @@ namespace RG35XX.Libraries
                     continue;
                 }
 
+                if (_cursorX >= Width)
+                {
+                    _cursorX = 0;
+                    _cursorY++;
+                }
+
+                if (_cursorY >= Height)
+                {
+                    this.ScrollBufferUp();
+                    _cursorY = Height - 1;
+                }
+
                 if (c == '\n')
                 {
                     _cursorX = 0;
                     _cursorY++;
-
-                    if (_cursorY >= Height)
-                    {
-                        this.ScrollBufferUp();
-                        _cursorY = Height - 1;
-                    }
                 }
                 else
                 {
@@ -128,17 +140,6 @@ namespace RG35XX.Libraries
                     };
 
                     _cursorX++;
-
-                    if (_cursorX >= Width)
-                    {
-                        _cursorX = 0;
-                        _cursorY++;
-                        if (_cursorY >= Height)
-                        {
-                            this.ScrollBufferUp();
-                            _cursorY = Height - 1;
-                        }
-                    }
                 }
             }
 

@@ -2,7 +2,6 @@
 
 namespace RG35XX.Linux
 {
-
     public partial class LinuxGamePadReader
     {
         [StructLayout(LayoutKind.Sequential)]
