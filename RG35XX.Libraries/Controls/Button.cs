@@ -129,7 +129,7 @@ namespace RG35XX.Libraries.Controls
 
                     Bitmap textMap = Font.Render(Text, width - spacing * 2, height - spacing * 2, TextColor, BackgroundColor, FontSize);
 
-                    bitmap.DrawBitmap(textMap, spacing, spacing);
+                    bitmap.DrawBitmap(textMap, (width / 2) - (textMap.Width / 2), (height / 2) - (textMap.Height / 2));
                 }
 
                 return bitmap;

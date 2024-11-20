@@ -121,23 +121,46 @@ namespace RG35XX.Core.Extensions
 
         public static Bitmap Render(this IFont font, string text, int width, int height, Color foregroundColor, Color backgroundColor, float size = 1, int padding = 1)
         {
-            Bitmap bitmap = new(width, height, backgroundColor);
-
             int x = 0;
             int y = 0;
+
+            List<Bitmap> charMaps = [];
 
             foreach (char c in text)
             {
                 Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2);
+                charMaps.Add(charmap);
+            }
 
-                bitmap.DrawBitmap(charmap, x, y);
+            int renderWidth = Math.Min(width, charMaps.Sum(c => c.Width));
 
+            int renderHeight = 0;
+
+            foreach (Bitmap charmap in charMaps)
+            {
                 x += charmap.Width;
 
-                if (x >= width)
+                if (x >= renderWidth)
                 {
-                    y += charmap.Height;
                     x = 0;
+                    renderHeight += charMaps.Max(x => x.Height);
+                }
+            }
+
+            x = 0;
+            y = 0;
+
+            Bitmap bitmap = new(renderWidth, renderHeight, backgroundColor);
+
+            foreach (Bitmap charmap in charMaps)
+            {
+                bitmap.DrawBitmap(charmap, x, y);
+                x += charmap.Width;
+
+                if(x >= renderWidth)
+                {
+                    x = 0;
+                    y += charMaps.Max(x => x.Height);
                 }
 
                 if (y >= height)
