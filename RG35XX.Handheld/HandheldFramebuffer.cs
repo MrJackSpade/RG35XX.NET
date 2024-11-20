@@ -3,7 +3,7 @@ using RG35XX.Core.Drawing;
 using RG35XX.Core.Interfaces;
 using System.Runtime.InteropServices;
 
-namespace RG35XX.Linux
+namespace RG35XX.Handheld
 {
     public partial class LinuxFramebuffer : IDisposable, IFrameBuffer
     {

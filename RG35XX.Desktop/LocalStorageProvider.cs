@@ -1,6 +1,6 @@
 ﻿using RG35XX.Core.Interfaces;
 
-namespace RG35XX.Windows
+namespace RG35XX.Desktop
 {
     public class LocalStorageProvider : IStorageProvider
     {

@@ -16,9 +16,9 @@ namespace RG35XX.Libraries
         public FrameBuffer()
         {
 #if DEBUG
-            _frameBuffer = new RG35XX.Windows.FormsFrameBuffer();
+            _frameBuffer = new RG35XX.Desktop.FormsFrameBuffer();
 #else
-            _frameBuffer = new RG35XX.Linux.LinuxFramebuffer();
+            _frameBuffer = new RG35XX.Handheld.LinuxFramebuffer();
 #endif
         }
 

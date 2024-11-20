@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+﻿using Avalonia;
 
-namespace RG35XX.Windows.Avalonia
+namespace RG35XX.Desktop.Avalonia
 {
     public static class AvaloniaInitializer
     {

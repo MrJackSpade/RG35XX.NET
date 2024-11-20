@@ -10,10 +10,10 @@ namespace RG35XX.Libraries
         public GamePadReader()
         {
 #if DEBUG
-            _gamePadReader = new RG35XX.Windows.KeyboardInput();
+            _gamePadReader = new RG35XX.Desktop.KeyboardInput();
 
 #else
-            _gamePadReader = new RG35XX.Linux.LinuxGamePadReader();
+            _gamePadReader = new RG35XX.Handheld.LinuxGamePadReader();
 #endif
         }
 

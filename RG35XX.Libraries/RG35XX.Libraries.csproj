@@ -7,11 +7,11 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
-		<ProjectReference Include="..\RG35XX.Windows\RG35XX.Desktop.csproj" />
+		<ProjectReference Include="..\RG35XX.Desktop\RG35XX.Desktop.csproj" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-		<ProjectReference Include="..\RG35XX.Linux\RG35XX.Linux.csproj" />
+		<ProjectReference Include="..\RG35XX.Handheld\RG35XX.Handheld.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using RG35XX.Core.Interfaces;
 
-namespace RG35XX.Linux
+namespace RG35XX.Handheld
 {
     public class LinuxStorageProvider : IStorageProvider
     {

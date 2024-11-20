@@ -1,6 +1,6 @@
 ﻿using Avalonia.Threading;
 
-namespace RG35XX.Windows.Avalonia
+namespace RG35XX.Desktop.Avalonia
 {
     public static class AvaloniaEventLoop
     {
@@ -16,7 +16,7 @@ namespace RG35XX.Windows.Avalonia
             _started = true;
 
             // Start the Avalonia event loop on a new thread
-            Thread t = new (() => Dispatcher.UIThread.MainLoop(CancellationToken.None));
+            Thread t = new(() => Dispatcher.UIThread.MainLoop(CancellationToken.None));
 
             t.Start();
         }

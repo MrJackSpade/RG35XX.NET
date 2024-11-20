@@ -3,14 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using RG35XX.Core.Interfaces;
 using RG35XX.Desktop.Avalonia;
-using RG35XX.Windows.Avalonia;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Bitmap = RG35XX.Core.Drawing.Bitmap;
 using Color = RG35XX.Core.Drawing.Color;
 
-namespace RG35XX.Windows
+namespace RG35XX.Desktop
 {
     public class FormsFrameBuffer : IFrameBuffer
     {
@@ -33,8 +29,10 @@ namespace RG35XX.Windows
         public int Width => _displayed?.Width ?? 0;
 
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<AvaloniaApp>()
-                         .UsePlatformDetect();
+        {
+            return AppBuilder.Configure<AvaloniaApp>()
+                                 .UsePlatformDetect();
+        }
 
         public void AppMain(Application app, string[] args)
         {
@@ -58,7 +56,7 @@ namespace RG35XX.Windows
         {
             if (_displayed == null)
             {
-                throw new System.InvalidOperationException();
+                throw new InvalidOperationException();
             }
 
             for (int y = 0; y < _displayed.Height; y++)
@@ -103,7 +101,7 @@ namespace RG35XX.Windows
 
         public void ShowWindow()
         {
-            var dispatcherReady = new ManualResetEvent(false);
+            ManualResetEvent dispatcherReady = new(false);
 
             // Start the Avalonia UI on a new thread
             _uiThread = new Thread(() =>

@@ -4,7 +4,6 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using RG35XX.Core.Drawing;
-using RG35XX.Core.GamePads;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 using CoreBitmap = RG35XX.Core.Drawing.Bitmap;
 

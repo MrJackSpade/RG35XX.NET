@@ -15,9 +15,9 @@ namespace RG35XX.Libraries
         public StorageProvider()
         {
 #if DEBUG
-            _storageProvider = new RG35XX.Windows.LocalStorageProvider();
+            _storageProvider = new RG35XX.Desktop.LocalStorageProvider();
 #else
-            _storageProvider = new RG35XX.Linux.LinuxStorageProvider();
+            _storageProvider = new RG35XX.Handheld.LinuxStorageProvider();
 #endif
         }
 

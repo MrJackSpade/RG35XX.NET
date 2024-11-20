@@ -3,7 +3,7 @@ using RG35XX.Core.Interfaces;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 
-namespace RG35XX.Linux
+namespace RG35XX.Handheld
 {
     public partial class LinuxGamePadReader : IGamePadReader
     {
