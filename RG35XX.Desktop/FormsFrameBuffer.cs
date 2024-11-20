@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using RG35XX.Core.Interfaces;
 using RG35XX.Desktop.Avalonia;
+using System.Runtime.InteropServices;
 using Bitmap = RG35XX.Core.Drawing.Bitmap;
 using Color = RG35XX.Core.Drawing.Color;
 
@@ -117,8 +118,12 @@ namespace RG35XX.Desktop
                     .Start(this.AppMain, null);
             });
 
-            _uiThread.SetApartmentState(ApartmentState.STA);
-            _uiThread.IsBackground = true;
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                _uiThread.SetApartmentState(ApartmentState.STA);
+                _uiThread.IsBackground = true;
+            }
+
             _uiThread.Start();
 
             // Wait until the Dispatcher is ready

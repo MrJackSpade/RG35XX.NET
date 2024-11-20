@@ -28,6 +28,8 @@ namespace RG35XX.Desktop.Avalonia
             KeyDown += this.OnKeyDown;
 
             KeyUp += this.OnKeyUp;
+
+            Closed += (sender, e) => System.Environment.Exit(0);
         }
 
         public void DisplayCustomBitmap(CoreBitmap customBitmap)
