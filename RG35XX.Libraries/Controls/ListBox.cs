@@ -62,6 +62,8 @@ namespace RG35XX.Libraries.Controls
 
         public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _controls.Count ? _controls[SelectedIndex] : null;
 
+        public override bool TabThroughChildren { get; set; } = false;
+
         public override Bitmap Draw(int width, int height)
         {
             int itemHeight = (int)(height * ItemHeight);

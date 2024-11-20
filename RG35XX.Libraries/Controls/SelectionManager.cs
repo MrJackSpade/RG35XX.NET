@@ -20,7 +20,7 @@
 
         public void SelectNext(Page page)
         {
-            List<Control> controlTree = this.GetSelectableChildren(page);
+            List<Control> controlTree = this.GetSelectableChildren(page).ToList();
 
             if (controlTree.Count == 0)
             {
@@ -50,7 +50,7 @@
 
         internal void SelectLast(Page page)
         {
-            List<Control> controlTree = this.GetSelectableChildren(page);
+            List<Control> controlTree = this.GetSelectableChildren(page).ToList();
 
             if (controlTree.Count == 0)
             {
@@ -87,11 +87,23 @@
             }
         }
 
-        private List<Control> GetSelectableChildren(Page page)
+        private IEnumerable<Control> GetSelectableChildren(Control control)
         {
-            List<Control> controlTree = [.. page.RecursiveChildren];
+            if (control.TabThroughChildren)
+            {
+                foreach (Control child in control.Controls)
+                {
+                    if (child.IsSelectable)
+                    {
+                        yield return child;
+                    }
 
-            return controlTree.Where(c => c.IsSelectable).ToList();
+                    foreach (Control c_child in this.GetSelectableChildren(child))
+                    {
+                        yield return c_child;
+                    }
+                }
+            }
         }
     }
 }

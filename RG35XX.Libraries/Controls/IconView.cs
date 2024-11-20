@@ -5,7 +5,11 @@ namespace RG35XX.Libraries.Controls
 {
     public class IconView : Control
     {
-        private int _borderThickness = 2;
+        private int _itemPadding = 20;
+
+        private int _insetBorderThickness = 2;
+
+        private int _windowPadding = 4;
 
         private Color _scrollBarColor = FormColors.ScrollBar;
 
@@ -15,12 +19,22 @@ namespace RG35XX.Libraries.Controls
 
         public override Color BackgroundColor { get; set; } = Color.White;
 
-        public int BorderThickness
+        public int ItemPadding
         {
-            get => _borderThickness;
+            get => _itemPadding;
             set
             {
-                _borderThickness = value;
+                _itemPadding = value;
+                Application?.MarkDirty();
+            }
+        }
+
+        public int InsetBorderThickness
+        {
+            get => _insetBorderThickness;
+            set
+            {
+                _insetBorderThickness = value;
                 Application?.MarkDirty();
             }
         }
@@ -30,6 +44,16 @@ namespace RG35XX.Libraries.Controls
         public ItemSelectionMode ItemSelectionMode { get; set; } = ItemSelectionMode.Single;
 
         public Size ItemSize { get; set; } = new Size(0.2f, 0.25f);
+
+        public int WindowPadding
+        {
+            get => _windowPadding;
+            set
+            {
+                _windowPadding = value;
+                Application?.MarkDirty();
+            }
+        }
 
         public Color ScrollBarColor
         {
@@ -55,6 +79,8 @@ namespace RG35XX.Libraries.Controls
 
         public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _controls.Count ? _controls[SelectedIndex] : null;
 
+        public override bool TabThroughChildren { get; set; } = false;
+
         public override Bitmap Draw(int width, int height)
         {
             int scrollBarWidth = 0;
@@ -64,10 +90,11 @@ namespace RG35XX.Libraries.Controls
                 scrollBarWidth = (int)(width * _scrollBarWidth);
             }
 
-            int clientWidth = width - scrollBarWidth;
+            int clientWidth = width - scrollBarWidth - (_insetBorderThickness * 2) - (_windowPadding * 2);
+            int clientHeight = height - (_insetBorderThickness * 2) - (_windowPadding * 2);
 
-            int itemWidth = (int)(clientWidth * ItemSize.Width);
-            int itemHeight = (int)(height * ItemSize.Height);
+            int itemWidth = (int)(clientWidth * ItemSize.Width) - _itemPadding * 2;
+            int itemHeight = (int)(clientHeight * ItemSize.Height) - _itemPadding * 2;
 
             int itemsPerRow = (int)(1 / ItemSize.Width);
             int itemsPerColumn = (int)(1 / ItemSize.Height);
@@ -113,19 +140,36 @@ namespace RG35XX.Libraries.Controls
                     int x = columnInPage * itemWidth;
                     int y = rowInPage * itemHeight;
 
-                    Bitmap itemBitmap = item.Draw(itemWidth - (_borderThickness * 2), itemHeight - (_borderThickness * 2));
+                    Bitmap itemBitmap = item.Draw(itemWidth,
+                                                  itemHeight);
+
+                    int xOffset = x + _insetBorderThickness + _windowPadding + _itemPadding * columnInPage * 2;
+                    int yOffset = y + _insetBorderThickness + _windowPadding + _itemPadding * rowInPage * 2;
 
                     if (item == SelectedItem)
                     {
-                        itemBitmap.DrawBorder(_borderThickness, HighlightColor);
+                        bitmap.DrawRectangle(xOffset,
+                                                   yOffset,
+                                                   itemWidth + (_itemPadding * 2),
+                                                   itemHeight + (_itemPadding * 2),
+                                                   HighlightColor,
+                                                   FillStyle.Fill);
                     }
 
-                    bitmap.DrawBitmap(itemBitmap, x + _borderThickness, y + _borderThickness);
+                    bitmap.DrawTransparentBitmap(xOffset + _itemPadding, yOffset + _itemPadding, itemBitmap);
                 }
+
+                if (_insetBorderThickness > 0)
+                {
+                    bitmap.DrawBorder(_insetBorderThickness, FormColors.ControlDarkDark, FormColors.ControlLightLight);
+                }
+
 
                 if (scrollBarWidth > 0)
                 {
-                    bitmap.DrawRectangle(clientWidth, 0, scrollBarWidth, height, _scrollBarColor, FillStyle.Fill);
+                    int scrollBarLeft = width - scrollBarWidth;
+
+                    bitmap.DrawRectangle(scrollBarLeft, 0, scrollBarWidth, height, _scrollBarColor, FillStyle.Fill);
 
                     int totalItems = _controls.Count;
                     int scrollHandleHeight = (int)(height * (float)itemsPerPage / totalItems);
@@ -134,7 +178,7 @@ namespace RG35XX.Libraries.Controls
                     Bitmap scrollHandle = new(scrollBarWidth, scrollHandleHeight, FormColors.ControlLight);
                     scrollHandle.DrawBorder(1, FormColors.ControlLightLight, FormColors.ControlDarkDark);
 
-                    bitmap.DrawBitmap(scrollHandle, clientWidth, scrollHandleY);
+                    bitmap.DrawBitmap(scrollHandle, scrollBarLeft, scrollHandleY);
                 }
 
                 return bitmap;

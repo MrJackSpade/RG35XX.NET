@@ -2,12 +2,6 @@
 using RG35XX.Core.Extensions;
 using RG35XX.Core.Fonts;
 using RG35XX.Core.Interfaces;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RG35XX.Libraries.Controls
 {
@@ -41,6 +35,20 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
+        private int _borderThickness = 2;
+
+        public int BorderThickness
+        {
+            get => _borderThickness;
+            set
+            {
+                _borderThickness = value;
+                Application?.MarkDirty();
+            }
+        }
+
+        public override bool IsSelectable { get; set; } = false;
+
         public string Title
         {
             get => _title;
@@ -63,23 +71,32 @@ namespace RG35XX.Libraries.Controls
 
         public override Bitmap Draw(int width, int height)
         {
+            int widthMinusBorder = width - (2 * _borderThickness);
+
+            int heightMinusBorder = height - (2 * _borderThickness);
+
             lock (_lock)
             {
                 Bitmap bitmap = new(width, height, BackgroundColor);
 
-                bitmap.DrawGradientRectangle(0, 0, width, (int)(height * _titleHeight), FormColors.TitleBarStart, FormColors.TitleBarEnd, GradientDirection.LeftToRight);
+                if (BorderThickness > 0)
+                {
+                    bitmap.DrawBorder(_borderThickness, FormColors.ControlLightLight, FormColors.ControlDarkDark);
+                }
+
+                bitmap.DrawGradientRectangle(_borderThickness, _borderThickness, widthMinusBorder, (int)(heightMinusBorder * _titleHeight), FormColors.TitleBarStart, FormColors.TitleBarEnd, GradientDirection.LeftToRight);
 
                 if (!string.IsNullOrEmpty(_title))
                 {
                     Bitmap title = Font.Render(_title, Color.White, Color.Transparent, _fontSize);
-                    bitmap.DrawTransparentBitmap(0, 0, title);
+                    bitmap.DrawTransparentBitmap(_borderThickness, _borderThickness, title);
                 }
 
-                int clientHeight = height - (int)(height * _titleHeight);
+                int clientHeight = heightMinusBorder - (int)(heightMinusBorder * _titleHeight);
 
-                Bitmap client = base.Draw(width, clientHeight);
+                Bitmap client = base.Draw(widthMinusBorder, clientHeight);
 
-                bitmap.DrawTransparentBitmap(0, (int)(height * _titleHeight), client);
+                bitmap.DrawTransparentBitmap(_borderThickness, (int)(heightMinusBorder * _titleHeight), client);
 
                 return bitmap;
             }

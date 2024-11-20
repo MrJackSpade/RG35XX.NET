@@ -30,7 +30,7 @@ namespace RG35XX.Libraries.Controls
 
         public static Color Highlight { get; set; } = Color.FromHex("#000080");
 
-        public static Color HighlightColor { get; set; } = Color.FromHex("#007ACC");
+        public static Color HighlightColor { get; set; } = Color.FromHex("#00EBEF");
 
         public static Color HighlightText { get; set; } = Color.FromHex("#FFFFFF");
 
