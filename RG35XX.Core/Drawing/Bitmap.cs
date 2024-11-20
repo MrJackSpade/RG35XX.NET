@@ -216,6 +216,23 @@
             return Pixels[(y * Width) + x];
         }
 
+        public Bitmap Resize(int newWidth, int newHeight)
+        {
+            Color[] newPixels = new Color[newWidth * newHeight];
+
+            for (int y = 0; y < newHeight; y++)
+            {
+                int origY = y * Height / newHeight;
+                for (int x = 0; x < newWidth; x++)
+                {
+                    int origX = x * Width / newWidth;
+                    newPixels[y * newWidth + x] = Pixels[origY * Width + origX];
+                }
+            }
+
+            return new Bitmap(newWidth, newHeight, newPixels);
+        }
+
         public void SetPixel(int x, int y, Color color)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height)

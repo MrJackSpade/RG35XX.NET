@@ -1,11 +1,12 @@
 ﻿using RG35XX.Core.Drawing;
 using RG35XX.Core.Extensions;
 using RG35XX.Core.Fonts;
+using RG35XX.Core.GamePads;
 using RG35XX.Core.Interfaces;
 
 namespace RG35XX.Libraries.Controls
 {
-    public class Label : Control
+    public class Button : Control
     {
         private IFont _font = ConsoleFont.Px437_IBM_VGA_8x16;
 
@@ -22,6 +23,8 @@ namespace RG35XX.Libraries.Controls
                 Renderer?.MarkDirty();
             }
         }
+
+        public override bool IsSelectable { get; set; } = true;
 
         public string? Text
         {
@@ -43,20 +46,50 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
+        public event EventHandler? Click;
+
         public override Bitmap Draw(int width, int height)
         {
+            width = Math.Min(width, height);
+            height = Math.Min(width, height);
+
             lock (_lock)
             {
-                Bitmap bitmap = new(width, height, BackgroundColor);
+                Bitmap bitmap;
+
+                if (IsSelected)
+                {
+                    bitmap = new(width, height, HighlightColor);
+                }
+                else
+                {
+                    bitmap = new Bitmap(width, height, TextColor);
+                }
+
+                bitmap.DrawRectangle(2, 2, width - 4, height - 4, BackgroundColor, FillStyle.Fill);
 
                 if (Text is not null)
                 {
-                    Bitmap textMap = Font.Render(Text, width, height, TextColor, BackgroundColor);
-                    bitmap.Draw(textMap, 0, 0);
+                    Bitmap textMap = Font.Render(Text, width - 6, height - 6, TextColor, BackgroundColor);
+
+                    bitmap.Draw(textMap, 3, 3);
                 }
 
                 return bitmap;
             }
+        }
+
+        public override void OnKey(GamepadKey key)
+        {
+            if (key == GamepadKey.A_DOWN)
+            {
+                this.OnClick();
+            }
+        }
+
+        protected virtual void OnClick()
+        {
+            Click?.Invoke(this, EventArgs.Empty);
         }
     }
 }
