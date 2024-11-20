@@ -1,5 +1,6 @@
 ﻿using RG35XX.Core.Drawing;
 using RG35XX.Core.GamePads;
+using RG35XX.Core.Interfaces;
 
 namespace RG35XX.Libraries.Controls
 {
@@ -8,6 +9,8 @@ namespace RG35XX.Libraries.Controls
         protected readonly object _lock = new();
 
         private readonly List<Control> _controls = [];
+
+        private bool _isSelected;
 
         public Color BackgroundColor { get; set; } = FormColors.BackgroundColor;
 
@@ -19,7 +22,15 @@ namespace RG35XX.Libraries.Controls
 
         public virtual bool IsSelectable { get; set; } = false;
 
-        public virtual bool IsSelected { get; internal set; } = false;
+        public virtual bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                Renderer?.MarkDirty();
+            }
+        }
 
         public Control? Parent { get; protected set; }
 
@@ -39,9 +50,19 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        public virtual void OnKey(GamepadKey key)
+        internal void SetRenderer(IRenderer? renderer)
         {
+            Renderer = renderer;
+
+            foreach (Control control in _controls)
+            {
+                control.SetRenderer(renderer);
+            }
+
+            Renderer?.MarkDirty();
         }
+
+        internal IRenderer? Renderer { get; set; }
 
         internal SelectionManager? SelectionManager { get; set; }
 
@@ -52,6 +73,7 @@ namespace RG35XX.Libraries.Controls
                 control.SelectionManager = SelectionManager;
                 control.Parent = this;
                 _controls.Add(control);
+                control.SetRenderer(Renderer);
             }
         }
 
@@ -80,6 +102,10 @@ namespace RG35XX.Libraries.Controls
 
                 return bitmap;
             }
+        }
+
+        public virtual void OnKey(GamepadKey key)
+        {
         }
 
         public void RemoveControl(Control control)

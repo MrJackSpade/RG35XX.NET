@@ -6,11 +6,15 @@ namespace RG35XX.Desktop
 {
     public static class KeyBus
     {
-        private static readonly ConcurrentQueue<GamepadKey> _keys = new();
+        // Replace ConcurrentQueue with BlockingCollection
+        private static readonly BlockingCollection<GamepadKey> _keys = new();
 
         public static void ClearBuffer()
         {
-            _keys.Clear();
+            while (_keys.Count > 0)
+            {
+                _keys.Take();
+            }
         }
 
         public static void OnKeyDown(KeyEventArgs e)
@@ -70,7 +74,7 @@ namespace RG35XX.Desktop
 
             if (key != GamepadKey.None)
             {
-                _keys.Enqueue(key);
+                _keys.Add(key); // Use Add instead of Enqueue
             }
         }
 
@@ -131,21 +135,14 @@ namespace RG35XX.Desktop
 
             if (key != GamepadKey.None)
             {
-                _keys.Enqueue(key);
+                _keys.Add(key); // Use Add instead of Enqueue
             }
         }
 
         public static GamepadKey ReadInput()
         {
-            if (_keys.Count > 0)
-            {
-                if (_keys.TryDequeue(out GamepadKey key))
-                {
-                    return key;
-                }
-            }
-
-            return GamepadKey.None;
+            // This will block until a key is available
+            return _keys.Take();
         }
     }
 }

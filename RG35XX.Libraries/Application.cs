@@ -6,7 +6,7 @@ using RG35XX.Libraries.Controls;
 
 namespace RG35XX.Libraries
 {
-    public class Application
+    public class Application : IRenderer
     {
         private readonly IFrameBuffer _frameBuffer;
 
@@ -23,6 +23,8 @@ namespace RG35XX.Libraries
         private readonly TaskCompletionSource<bool> _tcs;
 
         private bool _running;
+
+        private readonly AutoResetEvent _rendererWait = new(false);
 
         public Application(int width, int height)
         {
@@ -54,6 +56,14 @@ namespace RG35XX.Libraries
             }
         }
 
+        public void Dispose()
+        {
+            foreach (Page page in _pages)
+            {
+                page.Dispose();
+            }
+        }
+
         public Task Execute()
         {
             _running = true;
@@ -69,7 +79,9 @@ namespace RG35XX.Libraries
         {
             lock (_lock)
             {
+                page.SetRenderer(this);
                 _pages.Push(page);
+                this.MarkDirty();
             }
         }
 
@@ -94,6 +106,8 @@ namespace RG35XX.Libraries
         {
             while (_running)
             {
+                _rendererWait.WaitOne();
+
                 lock (_lock)
                 {
                     Page page = _pages.Peek();
@@ -101,6 +115,11 @@ namespace RG35XX.Libraries
                     _frameBuffer.Draw(bitmap, 0, 0);
                 }
             }
+        }
+
+        public void MarkDirty()
+        {
+            _rendererWait.Set();
         }
     }
 }
