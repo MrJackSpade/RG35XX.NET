@@ -9,6 +9,8 @@ namespace RG35XX.Libraries.Controls
     {
         private IFont _font = ConsoleFont.Px437_IBM_VGA_8x16;
 
+        private float _fontSize = 1;
+
         private string? _text;
 
         private Color _textColor = Color.Black;
@@ -19,6 +21,16 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _font = value;
+                Renderer?.MarkDirty();
+            }
+        }
+
+        public float FontSize
+        {
+            get => _fontSize;
+            set
+            {
+                _fontSize = value;
                 Renderer?.MarkDirty();
             }
         }
@@ -51,8 +63,8 @@ namespace RG35XX.Libraries.Controls
 
                 if (Text is not null)
                 {
-                    Bitmap textMap = Font.Render(Text, width, height, TextColor, BackgroundColor);
-                    bitmap.Draw(textMap, 0, 0);
+                    Bitmap textMap = Font.Render(Text, width, height, TextColor, BackgroundColor, FontSize);
+                    bitmap.DrawBitmap(textMap, 0, 0);
                 }
 
                 return bitmap;

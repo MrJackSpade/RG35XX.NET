@@ -63,7 +63,12 @@
             return result;
         }
 
-        public void Draw(Bitmap source, int offsetX, int offsetY)
+        public void DrawBitmap(int x, int y, Bitmap bitmap)
+        {
+            this.DrawBitmap(bitmap, x, y);
+        }
+
+        public void DrawBitmap(Bitmap source, int offsetX, int offsetY)
         {
             // Determine the area to copy
             int copyWidth = Math.Min(Width - offsetX, source.Width);
@@ -84,6 +89,29 @@
 
                 // Copy a block of pixels from source to destination
                 Array.Copy(source.Pixels, sourceIndex, Pixels, destIndex, copyWidth);
+            }
+        }
+
+        public void DrawBorder(int thickness, Color color)
+        {
+            // Draw top and bottom borders
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < thickness; y++)
+                {
+                    this.SetPixel(x, y, color); // Top border
+                    this.SetPixel(x, Height - y - 1, color); // Bottom border
+                }
+            }
+
+            // Draw left and right borders
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < thickness; x++)
+                {
+                    this.SetPixel(x, y, color); // Left border
+                    this.SetPixel(Width - x - 1, y, color); // Right border
+                }
             }
         }
 

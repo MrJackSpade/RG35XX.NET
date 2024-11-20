@@ -72,12 +72,12 @@ namespace RG35XX.Libraries
 
                     if (charMap != null)
                     {
-                        toDraw.Draw(charMap, x * _font.Width, y * _font.Height);
+                        toDraw.DrawBitmap(charMap, x * _font.Width, y * _font.Height);
                     }
                     else
                     {
                         Bitmap blankChar = new(_font.Width, _font.Height, charData.BackgroundColor);
-                        toDraw.Draw(blankChar, x * _font.Width, y * _font.Height);
+                        toDraw.DrawBitmap(blankChar, x * _font.Width, y * _font.Height);
                     }
                 }
             }

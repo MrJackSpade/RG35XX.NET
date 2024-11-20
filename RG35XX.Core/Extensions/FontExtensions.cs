@@ -5,37 +5,7 @@ namespace RG35XX.Core.Extensions
 {
     public static class FontExtensions
     {
-        public static Bitmap Render(this IFont font, string text, int width, int height, Color foregroundColor, Color backgroundColor)
-        {
-            Bitmap bitmap = new(width, height, backgroundColor);
-
-            int x = 0;
-            int y = 0;
-
-            foreach (char c in text)
-            {
-                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor);
-
-                bitmap.Draw(charmap, x, y);
-
-                x += charmap.Width;
-
-                if (x >= width)
-                {
-                    y += charmap.Height;
-                    x = 0;
-                }
-
-                if (y >= height)
-                {
-                    break;
-                }
-            }
-
-            return bitmap;
-        }
-
-        public static Bitmap GetCharacterMap(this IFont font, char index, Color foreground, Color background)
+        public static Bitmap GetCharacterMap(this IFont font, char index, Color foreground, Color background, float size = 1)
         {
             if (index == ' ')
             {
@@ -70,6 +40,41 @@ namespace RG35XX.Core.Extensions
                     {
                         bitmap.SetPixel(x, y, background);
                     }
+                }
+            }
+
+            if (size != 1)
+            {
+                bitmap = bitmap.Resize((int)(bitmap.Width * size), (int)(bitmap.Height * size));
+            }
+
+            return bitmap;
+        }
+
+        public static Bitmap Render(this IFont font, string text, int width, int height, Color foregroundColor, Color backgroundColor, float size = 1)
+        {
+            Bitmap bitmap = new(width, height, backgroundColor);
+
+            int x = 0;
+            int y = 0;
+
+            foreach (char c in text)
+            {
+                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size);
+
+                bitmap.DrawBitmap(charmap, x, y);
+
+                x += charmap.Width;
+
+                if (x >= width)
+                {
+                    y += charmap.Height;
+                    x = 0;
+                }
+
+                if (y >= height)
+                {
+                    break;
                 }
             }
 

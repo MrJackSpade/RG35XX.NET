@@ -6,11 +6,13 @@ namespace RG35XX.Libraries.Controls
 {
     public class Control : IDisposable
     {
+        protected readonly List<Control> _controls = [];
+
         protected readonly object _lock = new();
 
-        private readonly List<Control> _controls = [];
-
         private bool _isSelected;
+
+        private Control? _parent;
 
         public Color BackgroundColor { get; set; } = FormColors.BackgroundColor;
 
@@ -32,7 +34,15 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        public Control? Parent { get; protected set; }
+        public Control? Parent
+        {
+            get => _parent;
+            set
+            {
+                _parent?.RemoveControl(this);
+                _parent = value;
+            }
+        }
 
         public IEnumerable<Control> RecursiveChildren
         {
@@ -50,30 +60,24 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        internal void SetRenderer(IRenderer? renderer)
-        {
-            Renderer = renderer;
-
-            foreach (Control control in _controls)
-            {
-                control.SetRenderer(renderer);
-            }
-
-            Renderer?.MarkDirty();
-        }
-
         internal IRenderer? Renderer { get; set; }
 
         internal SelectionManager? SelectionManager { get; set; }
 
-        public void AddControl(Control control)
+        public bool AddControl(Control control)
         {
             lock (_lock)
             {
-                control.SelectionManager = SelectionManager;
-                control.Parent = this;
-                _controls.Add(control);
-                control.SetRenderer(Renderer);
+                if (!_controls.Contains(control))
+                {
+                    control.SelectionManager = SelectionManager;
+                    control.Parent = this;
+                    _controls.Add(control);
+                    control.SetRenderer(Renderer);
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -97,7 +101,7 @@ namespace RG35XX.Libraries.Controls
 
                     Bitmap controlBitmap = control.Draw(controlWidth, controlHeight);
 
-                    bitmap.Draw(controlBitmap, controlX, controlY);
+                    bitmap.DrawBitmap(controlBitmap, controlX, controlY);
                 }
 
                 return bitmap;
@@ -108,11 +112,17 @@ namespace RG35XX.Libraries.Controls
         {
         }
 
-        public void RemoveControl(Control control)
+        public bool RemoveControl(Control control)
         {
             lock (_lock)
             {
-                _controls.Remove(control);
+                if (_controls.Remove(control))
+                {
+                    control.Parent = null;
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -124,6 +134,18 @@ namespace RG35XX.Libraries.Controls
         public void Unselect()
         {
             SelectionManager?.Unselect(this);
+        }
+
+        internal void SetRenderer(IRenderer? renderer)
+        {
+            Renderer = renderer;
+
+            foreach (Control control in _controls)
+            {
+                control.SetRenderer(renderer);
+            }
+
+            Renderer?.MarkDirty();
         }
     }
 }

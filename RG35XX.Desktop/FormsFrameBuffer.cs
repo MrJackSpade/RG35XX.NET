@@ -78,7 +78,7 @@ namespace RG35XX.Desktop
                 throw new InvalidOperationException();
             }
 
-            _displayed.Draw(bitmap, x, y);
+            _displayed.DrawBitmap(bitmap, x, y);
 
             this.Dump();
         }

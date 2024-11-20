@@ -10,6 +10,8 @@ namespace RG35XX.Libraries.Controls
     {
         private IFont _font = ConsoleFont.Px437_IBM_VGA_8x16;
 
+        private float _fontSize = 1;
+
         private string? _text;
 
         private Color _textColor = Color.Black;
@@ -20,6 +22,16 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _font = value;
+                Renderer?.MarkDirty();
+            }
+        }
+
+        public float FontSize
+        {
+            get => _fontSize;
+            set
+            {
+                _fontSize = value;
                 Renderer?.MarkDirty();
             }
         }
@@ -50,29 +62,24 @@ namespace RG35XX.Libraries.Controls
 
         public override Bitmap Draw(int width, int height)
         {
-            width = Math.Min(width, height);
-            height = Math.Min(width, height);
-
             lock (_lock)
             {
-                Bitmap bitmap;
+                Bitmap bitmap = new(width, height, BackgroundColor);
 
                 if (IsSelected)
                 {
-                    bitmap = new(width, height, HighlightColor);
+                    bitmap.DrawBorder(2, HighlightColor);
                 }
                 else
                 {
-                    bitmap = new Bitmap(width, height, TextColor);
+                    bitmap.DrawBorder(2, TextColor);
                 }
-
-                bitmap.DrawRectangle(2, 2, width - 4, height - 4, BackgroundColor, FillStyle.Fill);
 
                 if (Text is not null)
                 {
-                    Bitmap textMap = Font.Render(Text, width - 6, height - 6, TextColor, BackgroundColor);
+                    Bitmap textMap = Font.Render(Text, width - 6, height - 6, TextColor, BackgroundColor, FontSize);
 
-                    bitmap.Draw(textMap, 3, 3);
+                    bitmap.DrawBitmap(textMap, 3, 3);
                 }
 
                 return bitmap;

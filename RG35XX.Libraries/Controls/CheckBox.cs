@@ -5,17 +5,6 @@ namespace RG35XX.Libraries.Controls
 {
     public class CheckBox : Control
     {
-        public override void OnKey(GamepadKey key)
-        {
-            if (key is GamepadKey.A_DOWN or GamepadKey.START_DOWN)
-            {
-                IsChecked = !IsChecked;
-                Renderer?.MarkDirty();
-            }
-
-            base.OnKey(key);
-        }
-
         public Color ForegroundColor { get; set; } = Color.White;
 
         public bool IsChecked { get; set; } = false;
@@ -29,14 +18,12 @@ namespace RG35XX.Libraries.Controls
 
             lock (_lock)
             {
-                Bitmap bitmap = new(width, height, BackgroundColor);
+                Bitmap bitmap = new(width, height, ForegroundColor);
 
                 if (IsSelected)
                 {
-                    bitmap.DrawRectangle(0, 0, width, height, HighlightColor, FillStyle.Fill);
+                    bitmap.DrawBorder(2, HighlightColor);
                 }
-
-                bitmap.DrawRectangle(2, 2, width - 4, height - 4, ForegroundColor, FillStyle.Fill);
 
                 if (IsChecked)
                 {
@@ -46,6 +33,17 @@ namespace RG35XX.Libraries.Controls
 
                 return bitmap;
             }
+        }
+
+        public override void OnKey(GamepadKey key)
+        {
+            if (key is GamepadKey.A_DOWN or GamepadKey.START_DOWN)
+            {
+                IsChecked = !IsChecked;
+                Renderer?.MarkDirty();
+            }
+
+            base.OnKey(key);
         }
     }
 }

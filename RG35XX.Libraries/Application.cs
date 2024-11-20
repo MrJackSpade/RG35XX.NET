@@ -18,13 +18,13 @@ namespace RG35XX.Libraries
 
         private readonly Stack<Page> _pages = new();
 
+        private readonly AutoResetEvent _rendererWait = new(false);
+
         private readonly Thread _renderingThread;
 
         private readonly TaskCompletionSource<bool> _tcs;
 
         private bool _running;
-
-        private readonly AutoResetEvent _rendererWait = new(false);
 
         public Application(int width, int height)
         {
@@ -75,6 +75,11 @@ namespace RG35XX.Libraries
             return _tcs.Task;
         }
 
+        public void MarkDirty()
+        {
+            _rendererWait.Set();
+        }
+
         public void OpenPage(Page page)
         {
             lock (_lock)
@@ -96,6 +101,7 @@ namespace RG35XX.Libraries
                     if (_pages.Count > 0)
                     {
                         Page page = _pages.Peek();
+
                         page.OnKey(key);
                     }
                 }
@@ -115,11 +121,6 @@ namespace RG35XX.Libraries
                     _frameBuffer.Draw(bitmap, 0, 0);
                 }
             }
-        }
-
-        public void MarkDirty()
-        {
-            _rendererWait.Set();
         }
     }
 }

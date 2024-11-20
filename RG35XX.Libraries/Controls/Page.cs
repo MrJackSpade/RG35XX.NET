@@ -27,7 +27,26 @@ namespace RG35XX.Libraries.Controls
 
             Control? selectedControl = SelectionManager?.SelectedControl;
 
-            selectedControl?.OnKey(key);
+            if (selectedControl is null)
+            {
+                SelectionManager?.SelectNext(this);
+                return;
+            }
+
+            Stack<Control> controls = new();
+
+            do
+            {
+                controls.Push(selectedControl);
+                selectedControl = selectedControl.Parent;
+            } while (selectedControl != null && selectedControl != this);
+
+            while (controls.Count > 0)
+            {
+                selectedControl = controls.Pop();
+
+                selectedControl.OnKey(key);
+            }
         }
     }
 }
