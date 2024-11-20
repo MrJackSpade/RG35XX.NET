@@ -8,13 +8,51 @@ namespace RG35XX.Libraries.Controls
 {
     public class Button : Control
     {
+        private Color _borderHighlight = FormColors.ControlLightLight;
+
+        private Color _borderShadow = FormColors.ControlDarkDark;
+
+        private int _borderThickness = 2;
+
         private IFont _font = ConsoleFont.ms_Sans_Serif_1;
 
         private float _fontSize = 1;
 
+        private int _padding = 1;
+
         private string? _text;
 
         private Color _textColor = Color.Black;
+
+        public Color BorderHighlight
+        {
+            get => _borderHighlight;
+            set
+            {
+                _borderHighlight = value;
+                Application?.MarkDirty();
+            }
+        }
+
+        public Color BorderShadow
+        {
+            get => _borderShadow;
+            set
+            {
+                _borderShadow = value;
+                Application?.MarkDirty();
+            }
+        }
+
+        public int BorderThickness
+        {
+            get => _borderThickness;
+            set
+            {
+                _borderThickness = value;
+                Application?.MarkDirty();
+            }
+        }
 
         public IFont Font
         {
@@ -38,6 +76,16 @@ namespace RG35XX.Libraries.Controls
 
         public override bool IsSelectable { get; set; } = true;
 
+        public int Padding
+        {
+            get => _padding;
+            set
+            {
+                _padding = value;
+                Application?.MarkDirty();
+            }
+        }
+
         public string? Text
         {
             get => _text;
@@ -59,54 +107,6 @@ namespace RG35XX.Libraries.Controls
         }
 
         public event EventHandler? Click;
-
-        private int _borderThickness = 2;
-
-        public int BorderThickness
-        {
-            get => _borderThickness;
-            set
-            {
-                _borderThickness = value;
-                Application?.MarkDirty();
-            }
-        }
-
-        private Color _borderHighlight = FormColors.ControlLightLight;
-
-        public Color BorderHighlight
-        {
-            get => _borderHighlight;
-            set
-            {
-                _borderHighlight = value;
-                Application?.MarkDirty();
-            }
-        }
-
-        private Color _borderShadow = FormColors.ControlDarkDark;
-
-        public Color BorderShadow
-        {
-            get => _borderShadow;
-            set
-            {
-                _borderShadow = value;
-                Application?.MarkDirty();
-            }
-        }
-
-        private int _padding = 1;
-
-        public int Padding
-        {
-            get => _padding;
-            set
-            {
-                _padding = value;
-                Application?.MarkDirty();
-            }
-        }
 
         public override Bitmap Draw(int width, int height)
         {

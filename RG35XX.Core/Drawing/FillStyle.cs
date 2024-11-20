@@ -3,6 +3,7 @@
     public enum FillStyle
     {
         Fill,
+
         Stroke
     }
 }

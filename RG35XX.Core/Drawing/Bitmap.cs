@@ -68,47 +68,6 @@
             this.DrawBitmap(bitmap, x, y);
         }
 
-        public void DrawTransparentBitmap(int x, int y, Bitmap bitmap)
-        {
-            for (int cy = 0; cy < bitmap.Height; cy++)
-            {
-                for (int cx = 0; cx < bitmap.Width; cx++)
-                {
-                    Color sourceColor = bitmap.GetPixel(cx, cy);
-
-                    // Skip fully transparent pixels
-                    if (sourceColor.A == 0)
-                    {
-                        continue;
-                    }
-
-                    // If pixel is fully opaque, just set it directly
-                    if (sourceColor.A == 255)
-                    {
-                        this.SetPixel(x + cx, y + cy, sourceColor);
-                        continue;
-                    }
-
-                    // Get the background color
-                    Color destColor = this.GetPixel(x + cx, y + cy);
-
-                    // Calculate alpha values
-                    float sourceAlpha = sourceColor.A / 255f;
-                    float destAlpha = destColor.A / 255f;
-
-                    // Blend the colors using alpha compositing formula
-                    int r = (int)((sourceColor.R * sourceAlpha) + (destColor.R * (1 - sourceAlpha)));
-                    int g = (int)((sourceColor.G * sourceAlpha) + (destColor.G * (1 - sourceAlpha)));
-                    int b = (int)((sourceColor.B * sourceAlpha) + (destColor.B * (1 - sourceAlpha)));
-                    int a = (int)(255 * (sourceAlpha + (destAlpha * (1 - sourceAlpha))));
-
-                    // Create new blended color and set the pixel
-                    Color blendedColor = Color.FromArgb(a, r, g, b);
-                    this.SetPixel(x + cx, y + cy, blendedColor);
-                }
-            }
-        }
-
         public void DrawBitmap(Bitmap source, int offsetX, int offsetY)
         {
             // Determine the area to copy
@@ -320,6 +279,47 @@
                 {
                     this.SetPixel(x, y + dy, color); // Left edge
                     this.SetPixel(x + width - 1, y + dy, color); // Right edge
+                }
+            }
+        }
+
+        public void DrawTransparentBitmap(int x, int y, Bitmap bitmap)
+        {
+            for (int cy = 0; cy < bitmap.Height; cy++)
+            {
+                for (int cx = 0; cx < bitmap.Width; cx++)
+                {
+                    Color sourceColor = bitmap.GetPixel(cx, cy);
+
+                    // Skip fully transparent pixels
+                    if (sourceColor.A == 0)
+                    {
+                        continue;
+                    }
+
+                    // If pixel is fully opaque, just set it directly
+                    if (sourceColor.A == 255)
+                    {
+                        this.SetPixel(x + cx, y + cy, sourceColor);
+                        continue;
+                    }
+
+                    // Get the background color
+                    Color destColor = this.GetPixel(x + cx, y + cy);
+
+                    // Calculate alpha values
+                    float sourceAlpha = sourceColor.A / 255f;
+                    float destAlpha = destColor.A / 255f;
+
+                    // Blend the colors using alpha compositing formula
+                    int r = (int)((sourceColor.R * sourceAlpha) + (destColor.R * (1 - sourceAlpha)));
+                    int g = (int)((sourceColor.G * sourceAlpha) + (destColor.G * (1 - sourceAlpha)));
+                    int b = (int)((sourceColor.B * sourceAlpha) + (destColor.B * (1 - sourceAlpha)));
+                    int a = (int)(255 * (sourceAlpha + (destAlpha * (1 - sourceAlpha))));
+
+                    // Create new blended color and set the pixel
+                    Color blendedColor = Color.FromArgb(a, r, g, b);
+                    this.SetPixel(x + cx, y + cy, blendedColor);
                 }
             }
         }

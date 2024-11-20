@@ -14,7 +14,7 @@ namespace RG35XX.Libraries.Controls
 
         private Control? _parent;
 
-        public Color BackgroundColor { get; set; } = FormColors.ControlLight;
+        public virtual Color BackgroundColor { get; set; } = FormColors.ControlLight;
 
         public virtual Bounds Bounds { get; set; } = new(0, 0, 1, 1);
 

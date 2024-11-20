@@ -4,9 +4,6 @@ namespace RG35XX.Core.Fonts
 {
     public class MsSansSerif1 : IFont
     {
-        public int Width => 32;
-        public int Height => 32;
-
         public Dictionary<int, byte[][]> Data { get; } = new()
         {
             [33] =
@@ -3539,5 +3536,8 @@ namespace RG35XX.Core.Fonts
             ],
         };
 
+        public int Height => 32;
+
+        public int Width => 32;
     }
 }

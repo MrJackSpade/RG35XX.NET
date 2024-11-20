@@ -1,5 +1,4 @@
-﻿
-namespace RG35XX.Libraries.Controls
+﻿namespace RG35XX.Libraries.Controls
 {
     public class SelectionManager
     {
@@ -17,13 +16,6 @@ namespace RG35XX.Libraries.Controls
                 SelectedControl = control;
                 SelectedControl.IsSelected = true;
             }
-        }
-
-        private List<Control> GetSelectableChildren(Page page)
-        {
-            List<Control> controlTree = [.. page.RecursiveChildren];
-
-            return controlTree.Where(c => c.IsSelectable).ToList();
         }
 
         public void SelectNext(Page page)
@@ -93,6 +85,13 @@ namespace RG35XX.Libraries.Controls
                 SelectedControl.IsSelected = false;
                 SelectedControl = null;
             }
+        }
+
+        private List<Control> GetSelectableChildren(Page page)
+        {
+            List<Control> controlTree = [.. page.RecursiveChildren];
+
+            return controlTree.Where(c => c.IsSelectable).ToList();
         }
     }
 }

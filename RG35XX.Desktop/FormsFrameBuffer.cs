@@ -118,7 +118,7 @@ namespace RG35XX.Desktop
                     .Start(this.AppMain, null);
             });
 
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 _uiThread.SetApartmentState(ApartmentState.STA);
                 _uiThread.IsBackground = true;

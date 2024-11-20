@@ -6,14 +6,14 @@ namespace RG35XX.Libraries.Controls
     public enum ItemSelectionMode
     {
         None,
+
         Single,
+
         Multiple
     }
 
     public class ListBox : Control
     {
-        public ItemSelectionMode ItemSelectionMode { get; set; } = ItemSelectionMode.Single;
-
         private int _borderThickness = 2;
 
         private Color _scrollBarColor = FormColors.ScrollBar;
@@ -35,6 +35,8 @@ namespace RG35XX.Libraries.Controls
         public override bool IsSelectable { get; set; } = true;
 
         public float ItemHeight { get; set; } = 0.25f;
+
+        public ItemSelectionMode ItemSelectionMode { get; set; } = ItemSelectionMode.Single;
 
         public Color ScrollBarColor
         {
@@ -151,14 +153,15 @@ namespace RG35XX.Libraries.Controls
             }
             else if (key == GamepadKey.A_DOWN)
             {
-                if(ItemSelectionMode == ItemSelectionMode.Single)
+                if (ItemSelectionMode == ItemSelectionMode.Single)
                 {
                     if (SelectedItem is not null)
                     {
                         SelectedItem.IsSelected = !SelectedItem.IsSelected;
                         Application?.MarkDirty();
                     }
-                } else if (ItemSelectionMode == ItemSelectionMode.Multiple)
+                }
+                else if (ItemSelectionMode == ItemSelectionMode.Multiple)
                 {
                     throw new NotImplementedException();
                 }

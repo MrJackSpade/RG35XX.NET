@@ -13,6 +13,8 @@ namespace RG35XX.Libraries.Controls
 
         private int firstVisibleItemIndex = 0;
 
+        public override Color BackgroundColor { get; set; } = Color.White;
+
         public int BorderThickness
         {
             get => _borderThickness;
@@ -25,11 +27,9 @@ namespace RG35XX.Libraries.Controls
 
         public override bool IsSelectable { get; set; } = true;
 
-        public float ItemHeight { get; set; } = 0.25f;
-
         public ItemSelectionMode ItemSelectionMode { get; set; } = ItemSelectionMode.Single;
 
-        public float ItemWidth { get; set; } = 0.25f;
+        public Size ItemSize { get; set; } = new Size(0.2f, 0.25f);
 
         public Color ScrollBarColor
         {
@@ -66,11 +66,11 @@ namespace RG35XX.Libraries.Controls
 
             int clientWidth = width - scrollBarWidth;
 
-            int itemWidth = (int)(clientWidth * ItemWidth);
-            int itemHeight = (int)(height * ItemHeight);
+            int itemWidth = (int)(clientWidth * ItemSize.Width);
+            int itemHeight = (int)(height * ItemSize.Height);
 
-            int itemsPerRow = (int)(1 / ItemWidth);
-            int itemsPerColumn = (int)(1 / ItemHeight);
+            int itemsPerRow = (int)(1 / ItemSize.Width);
+            int itemsPerColumn = (int)(1 / ItemSize.Height);
             int itemsPerPage = itemsPerRow * itemsPerColumn;
 
             lock (_lock)
@@ -93,18 +93,25 @@ namespace RG35XX.Libraries.Controls
                 {
                     firstVisibleItemIndex = selectedIndex;
                 }
-                else if (selectedIndex >= firstVisibleItemIndex + itemsPerPage)
+
+                while (selectedIndex >= firstVisibleItemIndex + itemsPerPage)
                 {
-                    firstVisibleItemIndex = selectedIndex - itemsPerPage + 1;
+                    firstVisibleItemIndex += itemsPerRow;
                 }
 
-                int x = 0;
-                int y = 0;
-                int itemsInCurrentRow = 0;
+                int endItemIndex = Math.Min(_controls.Count, firstVisibleItemIndex + itemsPerPage);
 
-                for (int i = firstVisibleItemIndex; i < _controls.Count && i < firstVisibleItemIndex + itemsPerPage; i++)
+                for (int index = firstVisibleItemIndex; index < endItemIndex; index++)
                 {
-                    Control item = _controls[i];
+                    Control item = _controls[index];
+
+                    int itemIndexInPage = index - firstVisibleItemIndex;
+
+                    int rowInPage = itemIndexInPage / itemsPerRow;
+                    int columnInPage = itemIndexInPage % itemsPerRow;
+
+                    int x = columnInPage * itemWidth;
+                    int y = rowInPage * itemHeight;
 
                     Bitmap itemBitmap = item.Draw(itemWidth - (_borderThickness * 2), itemHeight - (_borderThickness * 2));
 
@@ -114,16 +121,6 @@ namespace RG35XX.Libraries.Controls
                     }
 
                     bitmap.DrawBitmap(itemBitmap, x + _borderThickness, y + _borderThickness);
-
-                    x += itemWidth;
-                    itemsInCurrentRow++;
-
-                    if (itemsInCurrentRow >= itemsPerRow)
-                    {
-                        x = 0;
-                        y += itemHeight;
-                        itemsInCurrentRow = 0;
-                    }
                 }
 
                 if (scrollBarWidth > 0)
@@ -134,7 +131,7 @@ namespace RG35XX.Libraries.Controls
                     int scrollHandleHeight = (int)(height * (float)itemsPerPage / totalItems);
                     int scrollHandleY = (int)(height * (float)firstVisibleItemIndex / totalItems);
 
-                    Bitmap scrollHandle = new(scrollBarWidth, scrollHandleHeight, BackgroundColor);
+                    Bitmap scrollHandle = new(scrollBarWidth, scrollHandleHeight, FormColors.ControlLight);
                     scrollHandle.DrawBorder(1, FormColors.ControlLightLight, FormColors.ControlDarkDark);
 
                     bitmap.DrawBitmap(scrollHandle, clientWidth, scrollHandleY);
@@ -146,7 +143,7 @@ namespace RG35XX.Libraries.Controls
 
         public override void OnKey(GamepadKey key)
         {
-            int itemsPerRow = (int)(1 / ItemWidth);
+            int itemsPerRow = (int)(1 / ItemSize.Width);
 
             if (key == GamepadKey.LEFT)
             {
@@ -166,7 +163,12 @@ namespace RG35XX.Libraries.Controls
             }
             else if (key == GamepadKey.UP)
             {
-                if (SelectedIndex - itemsPerRow >= 0)
+                if (SelectedIndex < 0)
+                {
+                    SelectedIndex = 0;
+                    Application?.MarkDirty();
+                }
+                else if (SelectedIndex - itemsPerRow >= 0)
                 {
                     SelectedIndex -= itemsPerRow;
                     Application?.MarkDirty();
@@ -179,7 +181,12 @@ namespace RG35XX.Libraries.Controls
             }
             else if (key == GamepadKey.DOWN)
             {
-                if (SelectedIndex + itemsPerRow < _controls.Count)
+                if (SelectedIndex < 0)
+                {
+                    SelectedIndex = 0;
+                    Application?.MarkDirty();
+                }
+                else if (SelectedIndex + itemsPerRow < _controls.Count)
                 {
                     SelectedIndex += itemsPerRow;
                     Application?.MarkDirty();
