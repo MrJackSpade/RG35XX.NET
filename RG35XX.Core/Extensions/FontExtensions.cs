@@ -5,11 +5,18 @@ namespace RG35XX.Core.Extensions
 {
     public static class FontExtensions
     {
-        public static Bitmap GetCharacterMap(this IFont font, char index, Color foreground, Color background, float size = 1)
+        public static Bitmap GetCharacterMap(this IFont font, char index, Color foreground, Color background, float size = 1, int padding = -1)
         {
             if (index == ' ')
             {
-                return new Bitmap(font.Width, font.Height, background);
+                if (padding == -1)
+                {
+                    return new Bitmap((int)(font.Width * size), (int)(font.Height * size), background);
+                }
+                else
+                {
+                    return new Bitmap(padding * 2, (int)(font.Height * size), background);
+                }
             }
 
             if (!font.Data.TryGetValue(index, out byte[][]? fullData))
@@ -17,41 +24,102 @@ namespace RG35XX.Core.Extensions
                 return null;
             }
 
-            if (font.Width > 8)
-            {
-                throw new NotImplementedException("Font width > 8 is not implemented");
-            }
+            int minX = font.Width;
+            int maxX = 0;
 
-            Bitmap bitmap = new(font.Width, font.Height);
-
+            // Determine the minimal x-range where the character has foreground pixels
             for (int y = 0; y < font.Height; y++)
             {
                 for (int x = 0; x < font.Width; x++)
                 {
-                    //First byte is the first 8 bits, if theres multiple bytes
-                    //we need to write new code to handle that
-                    byte pixel = fullData[y][0];
+                    int byteIndex = x / 8;
+                    int bitIndex = x % 8;
 
-                    if ((pixel & (1 << x)) != 0)
+                    byte pixelByte = fullData[y][byteIndex];
+
+                    if ((pixelByte & (1 << bitIndex)) != 0)
                     {
-                        bitmap.SetPixel(x, y, foreground);
+                        if (x < minX)
+                        {
+                            minX = x;
+                        }
+
+                        if (x > maxX)
+                        {
+                            maxX = x;
+                        }
                     }
-                    else
+                }
+            }
+
+            if (padding == -1)
+            {
+                minX = 0;
+                maxX = font.Width - 1;
+            }
+            else
+            {
+                minX = Math.Max(0, minX - padding);
+                maxX = Math.Min(font.Width - 1, maxX + padding);
+            }
+
+            int newWidth = maxX - minX + 1;
+
+            Bitmap bitmap = new(newWidth, font.Height, background);
+
+            for (int y = 0; y < font.Height; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    int byteIndex = x / 8;
+                    int bitIndex = x % 8;
+
+                    byte pixelByte = fullData[y][byteIndex];
+
+                    if ((pixelByte & (1 << bitIndex)) != 0)
                     {
-                        bitmap.SetPixel(x, y, background);
+                        bitmap.SetPixel(x - minX, y, foreground);
                     }
+                    // Background pixels are already set during bitmap initialization
                 }
             }
 
             if (size != 1)
             {
-                bitmap = bitmap.Resize((int)(bitmap.Width * size), (int)(bitmap.Height * size));
+                bitmap = bitmap.Resize((int)(bitmap.Width * size), (int)(bitmap.Height * size), ResizeMode.Average);
             }
 
             return bitmap;
         }
 
-        public static Bitmap Render(this IFont font, string text, int width, int height, Color foregroundColor, Color backgroundColor, float size = 1)
+        public static Bitmap Render(this IFont font, string text, Color foregroundColor, Color backgroundColor, float size = 1, int padding = 1)
+        {
+            int x = 0;
+            int y = 0;
+
+            List<Bitmap> charMaps = [];
+
+            foreach (char c in text)
+            {
+                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2);
+                charMaps.Add(charmap);
+            }
+
+            int width = charMaps.Sum(c => c.Width);
+            int height = charMaps.Max(c => c.Height);
+
+            Bitmap bitmap = new(width, height, backgroundColor);
+
+            foreach (Bitmap charmap in charMaps)
+            {
+                bitmap.DrawBitmap(charmap, x, y);
+                x += charmap.Width;
+            }
+
+            return bitmap;
+        }
+
+        public static Bitmap Render(this IFont font, string text, int width, int height, Color foregroundColor, Color backgroundColor, float size = 1, int padding = 1)
         {
             Bitmap bitmap = new(width, height, backgroundColor);
 
@@ -60,7 +128,7 @@ namespace RG35XX.Core.Extensions
 
             foreach (char c in text)
             {
-                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size);
+                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2);
 
                 bitmap.DrawBitmap(charmap, x, y);
 

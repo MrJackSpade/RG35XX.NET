@@ -7,7 +7,7 @@ namespace RG35XX.Libraries.Controls
 {
     public class Label : Control
     {
-        private IFont _font = ConsoleFont.Px437_IBM_VGA_8x16;
+        private IFont _font = ConsoleFont.ms_Sans_Serif_1;
 
         private float _fontSize = 1;
 
@@ -21,7 +21,7 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _font = value;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
         }
 
@@ -31,7 +31,7 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _fontSize = value;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
         }
 
@@ -41,7 +41,7 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _text = value;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
         }
 
@@ -51,7 +51,7 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _textColor = value;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
         }
 

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RG35XX.Core.Interfaces
+namespace RG35XX.Core.Drawing
 {
-    public interface IRenderer
+    public enum ResizeMode
     {
-        void MarkDirty();
+        NearestNeighbor,
+        Average
     }
 }

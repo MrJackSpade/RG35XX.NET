@@ -9,6 +9,11 @@ namespace RG35XX.Libraries.Controls
             SelectionManager = new();
         }
 
+        public void Close()
+        {
+            Application?.ClosePage(this);
+        }
+
         public override void OnKey(GamepadKey key)
         {
             if (key == GamepadKey.L1_DOWN)

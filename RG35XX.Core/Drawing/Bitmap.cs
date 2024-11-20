@@ -68,6 +68,47 @@
             this.DrawBitmap(bitmap, x, y);
         }
 
+        public void DrawTransparentBitmap(int x, int y, Bitmap bitmap)
+        {
+            for (int cy = 0; cy < bitmap.Height; cy++)
+            {
+                for (int cx = 0; cx < bitmap.Width; cx++)
+                {
+                    Color sourceColor = bitmap.GetPixel(cx, cy);
+
+                    // Skip fully transparent pixels
+                    if (sourceColor.A == 0)
+                    {
+                        continue;
+                    }
+
+                    // If pixel is fully opaque, just set it directly
+                    if (sourceColor.A == 255)
+                    {
+                        this.SetPixel(x + cx, y + cy, sourceColor);
+                        continue;
+                    }
+
+                    // Get the background color
+                    Color destColor = this.GetPixel(x + cx, y + cy);
+
+                    // Calculate alpha values
+                    float sourceAlpha = sourceColor.A / 255f;
+                    float destAlpha = destColor.A / 255f;
+
+                    // Blend the colors using alpha compositing formula
+                    int r = (int)((sourceColor.R * sourceAlpha) + (destColor.R * (1 - sourceAlpha)));
+                    int g = (int)((sourceColor.G * sourceAlpha) + (destColor.G * (1 - sourceAlpha)));
+                    int b = (int)((sourceColor.B * sourceAlpha) + (destColor.B * (1 - sourceAlpha)));
+                    int a = (int)(255 * (sourceAlpha + (destAlpha * (1 - sourceAlpha))));
+
+                    // Create new blended color and set the pixel
+                    Color blendedColor = Color.FromArgb(a, r, g, b);
+                    this.SetPixel(x + cx, y + cy, blendedColor);
+                }
+            }
+        }
+
         public void DrawBitmap(Bitmap source, int offsetX, int offsetY)
         {
             // Determine the area to copy
@@ -92,15 +133,15 @@
             }
         }
 
-        public void DrawBorder(int thickness, Color color)
+        public void DrawBorder(int thickness, Color upperLeft, Color lowerRight)
         {
             // Draw top and bottom borders
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < thickness; y++)
                 {
-                    this.SetPixel(x, y, color); // Top border
-                    this.SetPixel(x, Height - y - 1, color); // Bottom border
+                    this.SetPixel(x, y, upperLeft); // Top border
+                    this.SetPixel(x, Height - y - 1, lowerRight); // Bottom border
                 }
             }
 
@@ -109,10 +150,15 @@
             {
                 for (int x = 0; x < thickness; x++)
                 {
-                    this.SetPixel(x, y, color); // Left border
-                    this.SetPixel(Width - x - 1, y, color); // Right border
+                    this.SetPixel(x, y, upperLeft); // Left border
+                    this.SetPixel(Width - x - 1, y, lowerRight); // Right border
                 }
             }
+        }
+
+        public void DrawBorder(int thickness, Color color)
+        {
+            this.DrawBorder(thickness, color, color);
         }
 
         public void DrawCircle(int centerX, int centerY, int radius, Color color, FillStyle fillStyle)
@@ -157,6 +203,50 @@
                     {
                         x--;
                         decisionOver2 += (2 * (y - x)) + 1;
+                    }
+                }
+            }
+        }
+
+        public void DrawGradientRectangle(int x, int y, int width, int height, Color startColor, Color endColor, GradientDirection direction)
+        {
+            if (direction == GradientDirection.LeftToRight)
+            {
+                for (int dx = 0; dx < width; dx++)
+                {
+                    // Calculate the interpolation factor (f) between 0 and 1
+                    float f = (width > 1) ? (float)dx / (width - 1) : 0;
+
+                    // Interpolate between startColor and endColor
+                    int R = (int)((startColor.R * (1 - f)) + (endColor.R * f));
+                    int G = (int)((startColor.G * (1 - f)) + (endColor.G * f));
+                    int B = (int)((startColor.B * (1 - f)) + (endColor.B * f));
+                    Color color = Color.FromRgb(R, G, B);
+
+                    // Draw a vertical line with the interpolated color
+                    for (int dy = 0; dy < height; dy++)
+                    {
+                        this.SetPixel(x + dx, y + dy, color);
+                    }
+                }
+            }
+            else if (direction == GradientDirection.TopToBottom)
+            {
+                for (int dy = 0; dy < height; dy++)
+                {
+                    // Calculate the interpolation factor (f) between 0 and 1
+                    float f = (height > 1) ? (float)dy / (height - 1) : 0;
+
+                    // Interpolate between startColor and endColor
+                    int R = (int)((startColor.R * (1 - f)) + (endColor.R * f));
+                    int G = (int)((startColor.G * (1 - f)) + (endColor.G * f));
+                    int B = (int)((startColor.B * (1 - f)) + (endColor.B * f));
+                    Color color = Color.FromRgb(R, G, B);
+
+                    // Draw a horizontal line with the interpolated color
+                    for (int dx = 0; dx < width; dx++)
+                    {
+                        this.SetPixel(x + dx, y + dy, color);
                     }
                 }
             }
@@ -244,17 +334,71 @@
             return Pixels[(y * Width) + x];
         }
 
-        public Bitmap Resize(int newWidth, int newHeight)
+        public Bitmap Resize(int newWidth, int newHeight, ResizeMode resizeMode)
         {
             Color[] newPixels = new Color[newWidth * newHeight];
 
-            for (int y = 0; y < newHeight; y++)
+            if (resizeMode == ResizeMode.NearestNeighbor)
             {
-                int origY = y * Height / newHeight;
-                for (int x = 0; x < newWidth; x++)
+                for (int y = 0; y < newHeight; y++)
                 {
-                    int origX = x * Width / newWidth;
-                    newPixels[y * newWidth + x] = Pixels[origY * Width + origX];
+                    int origY = y * Height / newHeight;
+                    for (int x = 0; x < newWidth; x++)
+                    {
+                        int origX = x * Width / newWidth;
+                        newPixels[(y * newWidth) + x] = Pixels[(origY * Width) + origX];
+                    }
+                }
+            }
+            else if (resizeMode == ResizeMode.Average)
+            {
+                for (int y = 0; y < newHeight; y++)
+                {
+                    float y0 = y * (float)Height / newHeight;
+                    float y1 = (y + 1) * (float)Height / newHeight;
+
+                    int origYStart = (int)Math.Floor(y0);
+                    int origYEnd = (int)Math.Ceiling(y1);
+
+                    for (int x = 0; x < newWidth; x++)
+                    {
+                        float x0 = x * (float)Width / newWidth;
+                        float x1 = (x + 1) * (float)Width / newWidth;
+
+                        int origXStart = (int)Math.Floor(x0);
+                        int origXEnd = (int)Math.Ceiling(x1);
+
+                        int rSum = 0, gSum = 0, bSum = 0, aSum = 0;
+                        int count = 0;
+
+                        for (int origY = origYStart; origY < origYEnd && origY < Height; origY++)
+                        {
+                            for (int origX = origXStart; origX < origXEnd && origX < Width; origX++)
+                            {
+                                Color c = Pixels[(origY * Width) + origX];
+                                rSum += c.R;
+                                gSum += c.G;
+                                bSum += c.B;
+                                aSum += c.A;
+                                count++;
+                            }
+                        }
+
+                        if (count > 0)
+                        {
+                            int avgA = aSum / count;
+                            int avgR = rSum / count;
+                            int avgG = gSum / count;
+                            int avgB = bSum / count;
+
+                            Color avgColor = Color.FromArgb(avgA, avgR, avgG, avgB);
+                            newPixels[(y * newWidth) + x] = avgColor;
+                        }
+                        else
+                        {
+                            newPixels[(y * newWidth) + x] = Color.Transparent;
+                        }
+                    }
                 }
             }
 

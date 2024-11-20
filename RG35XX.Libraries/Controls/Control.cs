@@ -14,7 +14,7 @@ namespace RG35XX.Libraries.Controls
 
         private Control? _parent;
 
-        public Color BackgroundColor { get; set; } = FormColors.BackgroundColor;
+        public Color BackgroundColor { get; set; } = FormColors.ControlLight;
 
         public virtual Bounds Bounds { get; set; } = new(0, 0, 1, 1);
 
@@ -30,7 +30,7 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _isSelected = value;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
         }
 
@@ -60,7 +60,7 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        internal IRenderer? Renderer { get; set; }
+        internal Application? Application { get; set; }
 
         internal SelectionManager? SelectionManager { get; set; }
 
@@ -73,7 +73,8 @@ namespace RG35XX.Libraries.Controls
                     control.SelectionManager = SelectionManager;
                     control.Parent = this;
                     _controls.Add(control);
-                    control.SetRenderer(Renderer);
+                    control.SetApplication(Application);
+                    Application?.MarkDirty();
                     return true;
                 }
 
@@ -136,16 +137,16 @@ namespace RG35XX.Libraries.Controls
             SelectionManager?.Unselect(this);
         }
 
-        internal void SetRenderer(IRenderer? renderer)
+        internal void SetApplication(Application? renderer)
         {
-            Renderer = renderer;
+            Application = renderer;
 
             foreach (Control control in _controls)
             {
-                control.SetRenderer(renderer);
+                control.SetApplication(renderer);
             }
 
-            Renderer?.MarkDirty();
+            Application?.MarkDirty();
         }
     }
 }

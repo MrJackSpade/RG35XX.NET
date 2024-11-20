@@ -6,7 +6,7 @@ using RG35XX.Libraries.Controls;
 
 namespace RG35XX.Libraries
 {
-    public class Application : IRenderer
+    public class Application
     {
         private readonly IFrameBuffer _frameBuffer;
 
@@ -46,6 +46,7 @@ namespace RG35XX.Libraries
                 {
                     Page page = _pages.Pop();
                     page.Dispose();
+                    this.MarkDirty();
                 }
 
                 if (_pages.Count == 0)
@@ -84,9 +85,22 @@ namespace RG35XX.Libraries
         {
             lock (_lock)
             {
-                page.SetRenderer(this);
+                page.SetApplication(this);
                 _pages.Push(page);
                 this.MarkDirty();
+            }
+        }
+
+        internal void ClosePage(Page page)
+        {
+            lock (_lock)
+            {
+                if (_pages.Count == 0 || !_pages.Peek().Equals(page))
+                {
+                    return;
+                }
+
+                this.ClosePage();
             }
         }
 

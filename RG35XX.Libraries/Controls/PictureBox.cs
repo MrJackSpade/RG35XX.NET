@@ -12,7 +12,7 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _image = value;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
         }
 
@@ -25,7 +25,7 @@ namespace RG35XX.Libraries.Controls
                     return new Bitmap(width, height, BackgroundColor);
                 }
 
-                return _image.Resize(width, height);
+                return _image.Resize(width, height, ResizeMode.Average);
             }
         }
     }

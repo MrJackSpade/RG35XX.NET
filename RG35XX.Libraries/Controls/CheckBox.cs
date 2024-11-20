@@ -40,7 +40,7 @@ namespace RG35XX.Libraries.Controls
             if (key is GamepadKey.A_DOWN or GamepadKey.START_DOWN)
             {
                 IsChecked = !IsChecked;
-                Renderer?.MarkDirty();
+                Application?.MarkDirty();
             }
 
             base.OnKey(key);
