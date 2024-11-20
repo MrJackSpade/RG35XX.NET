@@ -1,6 +1,6 @@
 ﻿using RG35XX.Core.GamePads;
 using RG35XX.Core.Interfaces;
-using RG35XX.Windows.Forms;
+using RG35XX.Desktop;
 
 namespace RG35XX.Windows
 {

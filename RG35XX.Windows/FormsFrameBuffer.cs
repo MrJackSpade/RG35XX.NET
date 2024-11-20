@@ -1,8 +1,12 @@
-﻿using RG35XX.Core.Interfaces;
-using RG35XX.Windows.Forms;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Threading;
+using RG35XX.Core.Interfaces;
+using RG35XX.Desktop.Avalonia;
+using RG35XX.Windows.Avalonia;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Windows.Forms;
 using Bitmap = RG35XX.Core.Drawing.Bitmap;
 using Color = RG35XX.Core.Drawing.Color;
 
@@ -14,15 +18,41 @@ namespace RG35XX.Windows
 
         private readonly object _rendererLock = new();
 
+        private readonly bool _shouldExit;
+
         private Bitmap? _displayed;
 
-        private Renderer? _renderer;
+        private MyBitmapWindow _renderer;
 
-        private bool _shouldExit;
+        private Dispatcher? _uiDispatcher;
+
+        private Thread? _uiThread;
 
         public int Height => _displayed?.Height ?? 0;
 
         public int Width => _displayed?.Width ?? 0;
+
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<AvaloniaApp>()
+                         .UsePlatformDetect();
+
+        public void AppMain(Application app, string[] args)
+        {
+            _renderer = new MyBitmapWindow(_displayed.Width, _displayed.Height);
+
+            _renderer.Opened += (sender, e) =>
+            {
+                lock (_rendererLock)
+                {
+                    _formDrawn.Set();
+                }
+            };
+
+            _renderer.Show();
+
+            // Start the Avalonia event loop (blocks until app exit)
+            app.Run(_renderer);
+        }
 
         public void Clear()
         {
@@ -42,16 +72,11 @@ namespace RG35XX.Windows
             this.Dump();
         }
 
-        public bool DiagnoseFramebuffer(string fbDevice = "/dev/fb0")
-        {
-            return true;
-        }
-
         public void Draw(Bitmap bitmap, int x, int y)
         {
             if (_displayed == null)
             {
-                throw new System.InvalidOperationException();
+                throw new InvalidOperationException();
             }
 
             _displayed.Draw(bitmap, x, y);
@@ -66,83 +91,40 @@ namespace RG35XX.Windows
                 throw new InvalidOperationException();
             }
 
-            if (_renderer == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            int width = _displayed.Width;
-            int height = _displayed.Height;
-            Color[] pixels = _displayed.Pixels; // Ensure this is your Color[] array with correct dimensions
-
-            // Create a new bitmap with the same dimensions and pixel format
-            System.Drawing.Bitmap bmp = new(width, height, PixelFormat.Format32bppArgb);
-
-            // Lock the bitmap's bits
-            BitmapData bmpData = bmp.LockBits(
-                new Rectangle(0, 0, width, height),
-                ImageLockMode.WriteOnly,
-                bmp.PixelFormat);
-
-            int bytesPerPixel = 4; // For Format32bppArgb
-            int srcStride = width * bytesPerPixel;
-            int dstStride = bmpData.Stride;
-
-            unsafe
-            {
-                byte* dstScan0 = (byte*)bmpData.Scan0;
-
-                fixed (Color* srcScan0 = pixels)
-                {
-                    byte* srcRow = (byte*)srcScan0;
-                    byte* dstRow = dstScan0;
-
-                    for (int y = 0; y < height; y++)
-                    {
-                        // Copy one scanline at a time
-                        Buffer.MemoryCopy(
-                            source: srcRow,
-                            destination: dstRow,
-                            destinationSizeInBytes: dstStride,
-                            sourceBytesToCopy: srcStride);
-
-                        srcRow += srcStride;
-                        dstRow += dstStride;
-                    }
-                }
-            }
-
-            // Unlock the bits
-            bmp.UnlockBits(bmpData);
-
-            lock (_rendererLock)
-            {
-                _renderer.Invoke(() => _renderer.SetImage(bmp));
-            }
+            _uiDispatcher.InvokeAsync(() => _renderer.DisplayCustomBitmap(_displayed));
         }
 
         public void Initialize(int width, int height)
         {
-            // Start the Windows Form on a separate thread
-            Thread formThread = new(() =>
+            _displayed = new(width, height);
+            this.ShowWindow();
+            _formDrawn.WaitOne();
+        }
+
+        public void ShowWindow()
+        {
+            var dispatcherReady = new ManualResetEvent(false);
+
+            // Start the Avalonia UI on a new thread
+            _uiThread = new Thread(() =>
             {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
-                _renderer = new();
-                _renderer.Initialize(width, height);
-                _renderer.Show();
-
-                _renderer.FormClosed += (s, e) => _shouldExit = true;
-                _renderer.Shown += (s, e) => _formDrawn.Set();
-                Application.Run(_renderer);
+                // Initialize Avalonia within the thread
+                BuildAvaloniaApp()
+                    .AfterSetup(_ =>
+                    {
+                        // Capture the Dispatcher
+                        _uiDispatcher = Dispatcher.UIThread;
+                        dispatcherReady.Set();
+                    })
+                    .Start(this.AppMain, null);
             });
 
-            formThread.SetApartmentState(ApartmentState.STA);
-            formThread.Start();
+            _uiThread.SetApartmentState(ApartmentState.STA);
+            _uiThread.IsBackground = true;
+            _uiThread.Start();
 
-            _displayed = new(width, height);
-            _formDrawn.WaitOne();
+            // Wait until the Dispatcher is ready
+            dispatcherReady.WaitOne();
         }
     }
 }

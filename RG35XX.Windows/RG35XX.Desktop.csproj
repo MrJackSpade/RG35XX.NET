@@ -8,12 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RG35XX.Core\RG35XX.Core.csproj" />
-    <ProjectReference Include="..\RG35XX.Windows.Forms\RG35XX.Windows.Forms.csproj" />
   </ItemGroup>
 
 </Project>
