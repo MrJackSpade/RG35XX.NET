@@ -128,8 +128,14 @@ namespace RG35XX.Core.Extensions
 
             foreach (char c in text)
             {
-                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2);
-                charMaps.Add(charmap);
+                Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2)
+                                 ?? font.GetCharacterMap('?', foregroundColor, backgroundColor, size, padding = 2)
+                                 ?? font.GetCharacterMap(' ', foregroundColor, backgroundColor, size, padding = 2);
+
+                if (charmap != null)
+                {
+                    charMaps.Add(charmap);
+                }
             }
 
             int renderWidth = Math.Min(width, charMaps.Sum(c => c.Width));

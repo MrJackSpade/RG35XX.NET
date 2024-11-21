@@ -4,6 +4,10 @@ namespace RG35XX.Libraries.Controls
 {
     public class Page : Control
     {
+        public virtual bool HasTransparency { get; set; } = false;
+
+        public event EventHandler? OnClosing;
+
         public Page()
         {
             SelectionManager = new();
@@ -12,6 +16,11 @@ namespace RG35XX.Libraries.Controls
         public void Close()
         {
             Application?.ClosePage(this);
+        }
+
+        public virtual void OnClose()
+        {
+            OnClosing?.Invoke(this, EventArgs.Empty);
         }
 
         public override void OnKey(GamepadKey key)
@@ -52,6 +61,10 @@ namespace RG35XX.Libraries.Controls
 
                 selectedControl.OnKey(key);
             }
+        }
+
+        public virtual void OnOpen()
+        {
         }
     }
 }

@@ -65,4 +65,4 @@ Provides an interface for writing to the output device:
 
 ## Publishing
 
-- Use the included `FolderProfile.pubxml` for publishing, or use it as a reference for custom settings.
+- Use the included `pubxml` files for publishing, or use it as a reference for custom settings.

@@ -93,8 +93,8 @@ namespace RG35XX.Libraries.Controls
             int clientWidth = width - scrollBarWidth - (_insetBorderThickness * 2) - (_windowPadding * 2);
             int clientHeight = height - (_insetBorderThickness * 2) - (_windowPadding * 2);
 
-            int itemWidth = (int)(clientWidth * ItemSize.Width) - _itemPadding * 2;
-            int itemHeight = (int)(clientHeight * ItemSize.Height) - _itemPadding * 2;
+            int itemWidth = (int)(clientWidth * ItemSize.Width) - (_itemPadding * 2);
+            int itemHeight = (int)(clientHeight * ItemSize.Height) - (_itemPadding * 2);
 
             int itemsPerRow = (int)(1 / ItemSize.Width);
             int itemsPerColumn = (int)(1 / ItemSize.Height);
@@ -143,8 +143,8 @@ namespace RG35XX.Libraries.Controls
                     Bitmap itemBitmap = item.Draw(itemWidth,
                                                   itemHeight);
 
-                    int xOffset = x + _insetBorderThickness + _windowPadding + _itemPadding * columnInPage * 2;
-                    int yOffset = y + _insetBorderThickness + _windowPadding + _itemPadding * rowInPage * 2;
+                    int xOffset = x + _insetBorderThickness + _windowPadding + (_itemPadding * columnInPage * 2);
+                    int yOffset = y + _insetBorderThickness + _windowPadding + (_itemPadding * rowInPage * 2);
 
                     if (item == SelectedItem)
                     {
@@ -163,7 +163,6 @@ namespace RG35XX.Libraries.Controls
                 {
                     bitmap.DrawBorder(_insetBorderThickness, FormColors.ControlDarkDark, FormColors.ControlLightLight);
                 }
-
 
                 if (scrollBarWidth > 0)
                 {

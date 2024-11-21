@@ -16,7 +16,7 @@ namespace RG35XX.Libraries
 
         private readonly object _lock = new();
 
-        private readonly Stack<Page> _pages = new();
+        private readonly List<Page> _pages = new();
 
         private readonly AutoResetEvent _rendererWait = new(false);
 
@@ -45,6 +45,7 @@ namespace RG35XX.Libraries
                 if (_pages.Count > 0)
                 {
                     Page page = _pages.Pop();
+                    page.OnClose();
                     page.Dispose();
                     this.MarkDirty();
                 }
@@ -87,6 +88,7 @@ namespace RG35XX.Libraries
             {
                 page.SetApplication(this);
                 _pages.Push(page);
+                page.OnOpen();
                 this.MarkDirty();
             }
         }
@@ -130,8 +132,32 @@ namespace RG35XX.Libraries
 
                 lock (_lock)
                 {
+                    Stack<Page> toRender = new();
+
                     Page page = _pages.Peek();
-                    Bitmap bitmap = page.Draw(_frameBuffer.Width, _frameBuffer.Height);
+
+                    int peekIndex = 1;
+
+                    do
+                    {
+                        toRender.Push(page);
+
+                        if(peekIndex >= _pages.Count)
+                        {
+                            break;
+                        }
+
+                        page = _pages.Peek(peekIndex++);
+                    } while (page.HasTransparency);
+
+                    Bitmap bitmap = new(_frameBuffer.Width, _frameBuffer.Height);
+
+                    while (toRender.Count > 0)
+                    {
+                        page = toRender.Pop();
+                        bitmap.DrawBitmap(page.Draw(_frameBuffer.Width, _frameBuffer.Height), 0, 0);
+                    }
+
                     _frameBuffer.Draw(bitmap, 0, 0);
                 }
             }
