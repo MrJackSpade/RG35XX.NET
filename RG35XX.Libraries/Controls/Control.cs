@@ -5,7 +5,7 @@ namespace RG35XX.Libraries.Controls
 {
     public class Control : IDisposable
     {
-        public EventHandler<GamepadKey>? OnKeyPressed { get; set; }
+        public event EventHandler<GamepadKey>? OnKeyPressed;
 
         protected readonly List<Control> _controls = [];
 

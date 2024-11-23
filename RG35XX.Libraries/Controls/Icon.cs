@@ -12,7 +12,7 @@ namespace RG35XX.Libraries.Controls
 
         private IFont _font = ConsoleFont.ms_Sans_Serif_1;
 
-        private float _fontSize = 1;
+        private float _fontSize = 0.5f;
 
         private Bitmap? _image = null;
 
@@ -98,6 +98,8 @@ namespace RG35XX.Libraries.Controls
 
         public event EventHandler? Click;
 
+        public event EventHandler<Exception> OnImageLoadFailed;
+
         public override Bitmap Draw(int width, int height)
         {
             lock (_lock)
@@ -147,6 +149,20 @@ namespace RG35XX.Libraries.Controls
         protected virtual void OnClick()
         {
             Click?.Invoke(this, EventArgs.Empty);
+        }
+
+        public async Task TryLoadImageAsync(string url)
+        {
+            try
+            {
+                Stream imageStream = await new HttpClient().GetStreamAsync(url);
+
+                Image = new Bitmap(imageStream);
+            }
+            catch (Exception ex)
+            {
+                OnImageLoadFailed?.Invoke(this, ex);
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ namespace RG35XX.Libraries.Controls
 {
     public class IconView : Control
     {
-        private int _itemPadding = 20;
+        private int _itemPadding = 10;
 
         private int _insetBorderThickness = 2;
 
@@ -13,7 +13,7 @@ namespace RG35XX.Libraries.Controls
 
         private Color _scrollBarColor = FormColors.ScrollBar;
 
-        private float _scrollBarWidth = 0.05f;
+        private float _scrollBarWidth = 0.03f;
 
         private int firstVisibleItemIndex = 0;
 
@@ -85,7 +85,11 @@ namespace RG35XX.Libraries.Controls
         {
             int scrollBarWidth = 0;
 
-            if (_controls.Count > 0)
+            int itemsPerRow = (int)(1 / ItemSize.Width);
+            int itemsPerColumn = (int)(1 / ItemSize.Height);
+            int itemsPerPage = itemsPerRow * itemsPerColumn;
+
+            if (_controls.Count > itemsPerPage)
             {
                 scrollBarWidth = (int)(width * _scrollBarWidth);
             }
@@ -95,10 +99,6 @@ namespace RG35XX.Libraries.Controls
 
             int itemWidth = (int)(clientWidth * ItemSize.Width) - (_itemPadding * 2);
             int itemHeight = (int)(clientHeight * ItemSize.Height) - (_itemPadding * 2);
-
-            int itemsPerRow = (int)(1 / ItemSize.Width);
-            int itemsPerColumn = (int)(1 / ItemSize.Height);
-            int itemsPerPage = itemsPerRow * itemsPerColumn;
 
             lock (_lock)
             {
