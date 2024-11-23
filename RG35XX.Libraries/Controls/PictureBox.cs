@@ -8,6 +8,17 @@ namespace RG35XX.Libraries.Controls
 
         private ScaleMode _scaleMode = ScaleMode.PreserveAspectRatio;
 
+        private Alignment _alignment = Alignment.MiddleCenter;
+
+        public Alignment Alignment
+        {
+            get => _alignment;
+            set
+            {
+                _alignment = value;
+                Application?.MarkDirty();
+            }
+        }
         public Bitmap? Image
         {
             get => _image;
@@ -39,7 +50,13 @@ namespace RG35XX.Libraries.Controls
                     return new Bitmap(width, height, BackgroundColor);
                 }
 
-                return _image.Scale(width, height, ResizeMode.Average, _scaleMode);
+                Bitmap bitmap = new(width, height, BackgroundColor);
+
+                Bitmap image =  _image.Scale(width, height, ResizeMode.Average, _scaleMode);
+
+                bitmap.DrawTransparentBitmap(_alignment, image);
+
+                return bitmap;
             }
         }
 

@@ -251,6 +251,54 @@
             }
         }
 
+        public void DrawTransparentBitmap(Alignment alignment, Bitmap image)
+        {
+            int x = 0;
+            int y = 0;
+
+            switch (alignment)
+            {
+                case Alignment.TopLeft:
+                    x = 0;
+                    y = 0;
+                    break;
+                case Alignment.TopCenter:
+                    x = (this.Width - image.Width) / 2;
+                    y = 0;
+                    break;
+                case Alignment.TopRight:
+                    x = this.Width - image.Width;
+                    y = 0;
+                    break;
+                case Alignment.MiddleLeft:
+                    x = 0;
+                    y = (this.Height - image.Height) / 2;
+                    break;
+                case Alignment.MiddleCenter:
+                    x = (this.Width - image.Width) / 2;
+                    y = (this.Height - image.Height) / 2;
+                    break;
+                case Alignment.MiddleRight:
+                    x = this.Width - image.Width;
+                    y = (this.Height - image.Height) / 2;
+                    break;
+                case Alignment.BottomLeft:
+                    x = 0;
+                    y = this.Height - image.Height;
+                    break;
+                case Alignment.BottomCenter:
+                    x = (this.Width - image.Width) / 2;
+                    y = this.Height - image.Height;
+                    break;
+                case Alignment.BottomRight:
+                    x = this.Width - image.Width;
+                    y = this.Height - image.Height;
+                    break;
+            }
+
+            this.DrawTransparentBitmap(x, y, image);
+        }
+
         public void DrawTransparentBitmap(int x, int y, Bitmap bitmap)
         {
             for (int cy = 0; cy < bitmap.Height; cy++)
