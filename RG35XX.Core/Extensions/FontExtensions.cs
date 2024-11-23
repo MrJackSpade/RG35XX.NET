@@ -9,13 +9,15 @@ namespace RG35XX.Core.Extensions
         {
             if (index == ' ')
             {
-                if (padding == -1)
+                if (padding == -1 || font.FixedWidth)
                 {
                     return new Bitmap((int)(font.Width * size), (int)(font.Height * size), background);
                 }
                 else
                 {
-                    return new Bitmap(padding * 2, (int)(font.Height * size), background);
+                    Bitmap bullshit = GetCharacterMap(font, 'A', foreground, background, size, 0);
+
+                    return new Bitmap(bullshit.Width, (int)(font.Height * size), background);
                 }
             }
 
@@ -52,7 +54,7 @@ namespace RG35XX.Core.Extensions
                 }
             }
 
-            if (padding == -1)
+            if (padding == -1 || font.FixedWidth)
             {
                 minX = 0;
                 maxX = font.Width - 1;

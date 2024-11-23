@@ -60,6 +60,21 @@ namespace RG35XX.Libraries
 
         public void Flush()
         {
+            Bitmap render = this.Render();
+
+            FrameBuffer.Draw(render, 0, 0);
+        }
+
+        public void Initialize(int width, int height)
+        {
+            FrameBuffer.Initialize(width, height);
+            Width = width / _font.Width;
+            Height = height / _font.Height;
+            this.Clear(false);
+        }
+
+        public Bitmap Render()
+        {
             Bitmap toDraw = new(Width * _font.Width, Height * _font.Height);
 
             for (int y = 0; y < Height; y++)
@@ -68,7 +83,13 @@ namespace RG35XX.Libraries
                 {
                     CharData charData = _buffer[y, x];
 
-                    Bitmap? charMap = _font.GetCharacterMap(charData.Char, charData.ForegroundColor, charData.BackgroundColor);
+                    Bitmap? charMap = null;
+
+                    if (charData.Char != '\0')
+                    {
+                        charMap = _font.GetCharacterMap(charData.Char, charData.ForegroundColor, charData.BackgroundColor) ??
+                                  _font.GetCharacterMap('?', charData.ForegroundColor, charData.BackgroundColor);
+                    }
 
                     if (charMap != null)
                     {
@@ -82,15 +103,7 @@ namespace RG35XX.Libraries
                 }
             }
 
-            FrameBuffer.Draw(toDraw, 0, 0);
-        }
-
-        public void Initialize(int width, int height)
-        {
-            FrameBuffer.Initialize(width, height);
-            Width = width / _font.Width;
-            Height = height / _font.Height;
-            this.Clear(false);
+            return toDraw;
         }
 
         public void SetCursorPosition(int x, int y)
@@ -99,9 +112,67 @@ namespace RG35XX.Libraries
             _cursorY = y;
         }
 
+        public void Write(char c)
+        {
+            this.Write(c, Color.White, Color.Black);
+        }
+
+        public void Write(char c, Color foreground)
+        {
+            this.Write(c, foreground, Color.Black);
+        }
+
+        public void Write(char c, Color foreground, Color background)
+        {
+
+            if (c == '\r')
+            {
+                return;
+            }
+
+            if (_cursorX >= Width)
+            {
+                _cursorX = 0;
+                _cursorY++;
+            }
+
+            if (_cursorY >= Height)
+            {
+                this.ScrollBufferUp();
+                _cursorY = Height - 1;
+            }
+
+            if (c == '\n')
+            {
+                _cursorX = 0;
+                _cursorY++;
+            }
+            else
+            {
+                _buffer[_cursorY, _cursorX] = new CharData()
+                {
+                    Char = c,
+                    BackgroundColor = background,
+                    ForegroundColor = foreground
+                };
+
+                _cursorX++;
+            }
+
+            if (AutoFlush)
+            {
+                this.Flush();
+            }
+        }
+
         public void Write(string text)
         {
             this.Write(text, Color.White, Color.Black);
+        }
+
+        public void Write(string text, Color foreground)
+        {
+            this.Write(text, foreground, Color.Black);
         }
 
         public void Write(string text, Color foreground, Color background)
@@ -152,6 +223,11 @@ namespace RG35XX.Libraries
         public void WriteLine(string text = "")
         {
             this.WriteLine(text, Color.White, Color.Black);
+        }
+
+        public void WriteLine(string? text, Color foreground)
+        {
+            this.Write(text + '\n', foreground, Color.Black);
         }
 
         public void WriteLine(string? text, Color foreground, Color background)

@@ -67,16 +67,20 @@ namespace RG35XX.Libraries.Pages
             SelectionManager?.Select(_keyboard);
         }
 
-        private void Keyboard_KeyDown(object? sender, char e)
+        private void Keyboard_KeyDown(object? sender, KeyboardButton e)
         {
-            switch (e)
+            switch (e.Text)
             {
-                case '←':
-                    _textArea.Text = _textArea.Text?[..^1];
+                case "Back":
+                    if (!string.IsNullOrEmpty(_textArea.Text))
+                    {
+                        _textArea.Text = _textArea.Text?[..^1];
+                    }
+
                     return;
 
                 default:
-                    _textArea.Text += e;
+                    _textArea.Text += e.Character;
                     return;
             }
         }

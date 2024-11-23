@@ -38,6 +38,17 @@ namespace RG35XX.Libraries
             _gamepadThread = new Thread(this.ReadGamePad);
         }
 
+        public Application(IFrameBuffer frameBuffer)
+        {
+            _tcs = new TaskCompletionSource<bool>();
+            _frameBuffer = frameBuffer;
+            _gamePadReader = new GamePadReader();
+            _gamePadReader.Initialize();
+
+            _renderingThread = new Thread(this.Render);
+            _gamepadThread = new Thread(this.ReadGamePad);
+        }
+
         public void ClosePage()
         {
             lock (_lock)

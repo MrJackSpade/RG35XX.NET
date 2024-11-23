@@ -5,6 +5,8 @@ namespace RG35XX.Libraries.Controls
 {
     public class Control : IDisposable
     {
+        public EventHandler<GamepadKey>? OnKeyPressed { get; set; }
+
         protected readonly List<Control> _controls = [];
 
         protected readonly object _lock = new();
@@ -112,6 +114,7 @@ namespace RG35XX.Libraries.Controls
 
         public virtual void OnKey(GamepadKey key)
         {
+            OnKeyPressed?.Invoke(this, key);
         }
 
         public bool RemoveControl(Control control)

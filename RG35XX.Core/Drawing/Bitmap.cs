@@ -19,6 +19,16 @@ namespace RG35XX.Core.Drawing
             this.FillPixelArray(image);
         }
 
+        public Bitmap(Stream stream)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+
+            // Load the stream into an image
+            using Image image = Image.Load(stream);
+
+            this.FillPixelArray(image);
+        }
+
         public Bitmap(string embeddedResourcePath, Assembly? assembly)
         {
             ArgumentNullException.ThrowIfNull(assembly);

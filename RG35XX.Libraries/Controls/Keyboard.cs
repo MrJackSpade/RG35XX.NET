@@ -13,15 +13,15 @@ namespace RG35XX.Libraries.Controls
 
         private int _selectedViewIndex = 0;
 
-        private KeyboardView SelectedView => _keyboardViews[_selectedViewIndex];
-
         public override bool IsSelectable { get; set; } = true;
 
         public override bool TabThroughChildren { get; set; } = false;
 
         private KeyboardButton SelectedKey => _keyboardViews[_selectedViewIndex].Buttons.ElementAt(_selectedKeyIndex);
 
-        public event EventHandler<char> KeyDown;
+        private KeyboardView SelectedView => _keyboardViews[_selectedViewIndex];
+
+        public event EventHandler<KeyboardButton> KeyDown;
 
         public Keyboard()
         {
@@ -50,6 +50,13 @@ namespace RG35XX.Libraries.Controls
                 "↓<>/?`~←",
                 ", ."
             ]);
+
+            symbolView.GetKey('↓').Text = "Lower";
+            lowercaseView.GetKey('↑').Text = "Upper";
+            uppercaseView.GetKey('$').Text = "Symbol";
+            symbolView.GetKey('←').Text = "Back";
+            lowercaseView.GetKey('←').Text = "Back";
+            uppercaseView.GetKey('←').Text = "Back";
 
             _keyboardViews[0] = lowercaseView;
             _keyboardViews[1] = uppercaseView;
@@ -92,50 +99,15 @@ namespace RG35XX.Libraries.Controls
             return keyView;
         }
 
-        private bool GetOffset( int direction, out int foundOffset)
-        {
-            foundOffset = -1;
-
-            KeyboardButton currentButton = SelectedKey;
-
-            KeyboardView currentView = SelectedView;
-
-            KeyboardRow currentRow = SelectedView.GetRow(currentButton.Character);
-
-            int rowIndex = currentView.Rows.IndexOf(currentRow);
-
-            if(rowIndex < 0)
-            {
-                return false;
-            }
-
-            int newIndex = rowIndex + direction;
-
-            if (newIndex < 0 || newIndex >= currentView.Rows.Count)
-            {
-                return false;
-            }
-
-            KeyboardRow aboveRow = currentView.Rows[newIndex];
-
-            float currentCenter = currentButton.Bounds.X + (currentButton.Bounds.Width / 2);
-
-            KeyboardButton closestButton = aboveRow.Buttons.Values.OrderBy(x => Math.Abs(x.Bounds.X + (x.Bounds.Width / 2) - currentCenter)).First();
-        
-            foundOffset = currentView.Buttons.IndexOf(closestButton);
-
-            return foundOffset >= 0;
-        }
-
         public override void OnKey(GamepadKey key)
         {
             base.OnKey(key);
 
             if (key == GamepadKey.UP)
             {
-                if(this.GetOffset(-1, out int foundOffset))
+                if (this.GetOffset(-1, out int foundOffset))
                 {
-                    _selectedKeyIndex = foundOffset; 
+                    _selectedKeyIndex = foundOffset;
                     Application?.MarkDirty();
                 }
             }
@@ -159,11 +131,14 @@ namespace RG35XX.Libraries.Controls
             }
             else if (key == GamepadKey.A_DOWN)
             {
-                this.SendKey(SelectedKey.Character);
+                this.SendKey(SelectedKey);
             }
             else if (key == GamepadKey.B_DOWN)
             {
-                this.SendKey('←');
+                this.SendKey(new KeyboardButton('←')
+                {
+                    Text = "Back"
+                });
             }
         }
 
@@ -181,23 +156,63 @@ namespace RG35XX.Libraries.Controls
             return view;
         }
 
-        private void SendKey(char character)
+        private bool GetOffset(int direction, out int foundOffset)
+        {
+            foundOffset = -1;
+
+            KeyboardButton currentButton = SelectedKey;
+
+            KeyboardView currentView = SelectedView;
+
+            KeyboardRow currentRow = SelectedView.GetRow(currentButton.Character);
+
+            int rowIndex = currentView.Rows.IndexOf(currentRow);
+
+            if (rowIndex < 0)
+            {
+                return false;
+            }
+
+            int newIndex = rowIndex + direction;
+
+            if (newIndex < 0 || newIndex >= currentView.Rows.Count)
+            {
+                return false;
+            }
+
+            KeyboardRow aboveRow = currentView.Rows[newIndex];
+
+            float currentCenter = currentButton.Bounds.X + (currentButton.Bounds.Width / 2);
+
+            KeyboardButton closestButton = aboveRow.Buttons.Values.OrderBy(x => Math.Abs(x.Bounds.X + (x.Bounds.Width / 2) - currentCenter)).First();
+
+            foundOffset = currentView.Buttons.IndexOf(closestButton);
+
+            return foundOffset >= 0;
+        }
+
+        private void SendKey(KeyboardButton button)
         {
             int lastSelectedView = _selectedViewIndex;
 
-            switch (character)
+            string? text = button.Text;
+
+            switch (text)
             {
-                case '↑':
+                case "Upper":
                     _selectedViewIndex = 1;
                     break;
-                case '↓':
+
+                case "Lower":
                     _selectedViewIndex = 0;
                     break;
-                case '$':
+
+                case "Symbol":
                     _selectedViewIndex = 2;
                     break;
+
                 default:
-                    KeyDown?.Invoke(this, character);
+                    KeyDown?.Invoke(this, button);
                     break;
             }
 

@@ -2,6 +2,8 @@
 {
     public interface IFont
     {
+        public bool FixedWidth { get; }
+
         Dictionary<int, byte[][]> Data { get; }
 
         int Height { get; }
