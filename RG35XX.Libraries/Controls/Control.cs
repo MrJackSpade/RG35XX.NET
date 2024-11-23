@@ -5,8 +5,6 @@ namespace RG35XX.Libraries.Controls
 {
     public class Control : IDisposable
     {
-        public event EventHandler<GamepadKey>? OnKeyPressed;
-
         protected readonly List<Control> _controls = [];
 
         protected readonly object _lock = new();
@@ -67,6 +65,8 @@ namespace RG35XX.Libraries.Controls
 
         internal SelectionManager? SelectionManager { get; set; }
 
+        public event EventHandler<GamepadKey>? OnKeyPressed;
+
         public bool AddControl(Control control)
         {
             lock (_lock)
@@ -105,7 +105,7 @@ namespace RG35XX.Libraries.Controls
 
                     Bitmap controlBitmap = control.Draw(controlWidth, controlHeight);
 
-                    bitmap.DrawBitmap(controlBitmap, controlX, controlY);
+                    bitmap.DrawTransparentBitmap(controlX, controlY, controlBitmap);
                 }
 
                 return bitmap;

@@ -98,7 +98,7 @@ namespace RG35XX.Libraries.Controls
 
         public event EventHandler? Click;
 
-        public event EventHandler<Exception> OnImageLoadFailed;
+        public event EventHandler<Exception>? OnImageLoadFailed;
 
         public override Bitmap Draw(int width, int height)
         {
@@ -108,24 +108,24 @@ namespace RG35XX.Libraries.Controls
 
                 if (IsSelected)
                 {
-                    bitmap.DrawBorder(this._borderThickness, HighlightColor);
+                    bitmap.DrawBorder(_borderThickness, HighlightColor);
                 }
 
                 int textHeight = 0;
 
                 if (Text is not null)
                 {
-                    int spacing = this._padding + this._borderThickness;
+                    int spacing = _padding + _borderThickness;
 
-                    Bitmap textMap = Font.Render(Text, width - spacing * 2, height - spacing * 2, TextColor, BackgroundColor, FontSize);
+                    Bitmap textMap = Font.Render(Text, width - (spacing * 2), height - (spacing * 2), TextColor, BackgroundColor, FontSize);
 
                     textHeight = textMap.Height;
 
-                    bitmap.DrawTransparentBitmap((width / 2) - (textMap.Width / 2), height - textHeight - (this._padding + this._borderThickness), textMap);
+                    bitmap.DrawTransparentBitmap((width / 2) - (textMap.Width / 2), height - textHeight - (_padding + _borderThickness), textMap);
                 }
 
-                int iconWidth = width - (this._padding + this._borderThickness) * 2;
-                int iconHeight = height - (this._padding + this._borderThickness) * 2 - textHeight;
+                int iconWidth = width - ((_padding + _borderThickness) * 2);
+                int iconHeight = height - ((_padding + _borderThickness) * 2) - textHeight;
 
                 if (Image is not null)
                 {
@@ -146,11 +146,6 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        protected virtual void OnClick()
-        {
-            Click?.Invoke(this, EventArgs.Empty);
-        }
-
         public async Task TryLoadImageAsync(string url)
         {
             try
@@ -163,6 +158,11 @@ namespace RG35XX.Libraries.Controls
             {
                 OnImageLoadFailed?.Invoke(this, ex);
             }
+        }
+
+        protected virtual void OnClick()
+        {
+            Click?.Invoke(this, EventArgs.Empty);
         }
     }
 }

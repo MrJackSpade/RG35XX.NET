@@ -7,7 +7,7 @@ namespace RG35XX.Desktop
     public static class KeyBus
     {
         // Replace ConcurrentQueue with BlockingCollection
-        private static readonly BlockingCollection<GamepadKey> _keys = new();
+        private static readonly BlockingCollection<GamepadKey> _keys = [];
 
         public static void ClearBuffer()
         {

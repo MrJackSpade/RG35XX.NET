@@ -22,6 +22,8 @@ namespace RG35XX.Libraries.Controls
 
         private int firstVisibleItemIndex = 0;
 
+        public override Color BackgroundColor { get; set; } = Color.White;
+
         public int BorderThickness
         {
             get => _borderThickness;

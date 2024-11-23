@@ -5423,10 +5423,10 @@ namespace RG35XX.Core.Fonts
             ],
         };
 
+        public bool FixedWidth => true;
+
         public int Height => 16;
 
         public int Width => 8;
-
-        public bool FixedWidth => true;
     }
 }

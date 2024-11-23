@@ -1,7 +1,7 @@
 ﻿using RG35XX.Core.Drawing;
+using RG35XX.Core.Extensions;
 using RG35XX.Core.GamePads;
 using RG35XX.Libraries.Controls.KeyboardControls;
-using RG35XX.Core.Extensions;
 
 namespace RG35XX.Libraries.Controls
 {

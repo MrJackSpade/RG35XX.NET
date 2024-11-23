@@ -5,29 +5,19 @@ namespace RG35XX.Libraries.Controls
 {
     public class IconView : Control
     {
-        private int _itemPadding = 10;
-
         private int _insetBorderThickness = 2;
 
-        private int _windowPadding = 4;
+        private int _itemPadding = 10;
 
         private Color _scrollBarColor = FormColors.ScrollBar;
 
         private float _scrollBarWidth = 0.03f;
 
+        private int _windowPadding = 4;
+
         private int firstVisibleItemIndex = 0;
 
         public override Color BackgroundColor { get; set; } = Color.White;
-
-        public int ItemPadding
-        {
-            get => _itemPadding;
-            set
-            {
-                _itemPadding = value;
-                Application?.MarkDirty();
-            }
-        }
 
         public int InsetBorderThickness
         {
@@ -41,19 +31,19 @@ namespace RG35XX.Libraries.Controls
 
         public override bool IsSelectable { get; set; } = true;
 
-        public ItemSelectionMode ItemSelectionMode { get; set; } = ItemSelectionMode.Single;
-
-        public Size ItemSize { get; set; } = new Size(0.2f, 0.25f);
-
-        public int WindowPadding
+        public int ItemPadding
         {
-            get => _windowPadding;
+            get => _itemPadding;
             set
             {
-                _windowPadding = value;
+                _itemPadding = value;
                 Application?.MarkDirty();
             }
         }
+
+        public ItemSelectionMode ItemSelectionMode { get; set; } = ItemSelectionMode.Single;
+
+        public Size ItemSize { get; set; } = new Size(0.2f, 0.25f);
 
         public Color ScrollBarColor
         {
@@ -80,6 +70,16 @@ namespace RG35XX.Libraries.Controls
         public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _controls.Count ? _controls[SelectedIndex] : null;
 
         public override bool TabThroughChildren { get; set; } = false;
+
+        public int WindowPadding
+        {
+            get => _windowPadding;
+            set
+            {
+                _windowPadding = value;
+                Application?.MarkDirty();
+            }
+        }
 
         public override Bitmap Draw(int width, int height)
         {

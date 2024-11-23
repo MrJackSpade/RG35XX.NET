@@ -7,6 +7,8 @@ namespace RG35XX.Libraries.Controls
 {
     public class Window : Control
     {
+        private int _borderThickness = 2;
+
         private IFont _font = ConsoleFont.MS_Sans_Serif_Bold;
 
         private float _fontSize = 0.6f;
@@ -14,6 +16,16 @@ namespace RG35XX.Libraries.Controls
         private string _title = string.Empty;
 
         private float _titleHeight = 0.05f;
+
+        public int BorderThickness
+        {
+            get => _borderThickness;
+            set
+            {
+                _borderThickness = value;
+                Application?.MarkDirty();
+            }
+        }
 
         public IFont Font
         {
@@ -31,18 +43,6 @@ namespace RG35XX.Libraries.Controls
             set
             {
                 _fontSize = value;
-                Application?.MarkDirty();
-            }
-        }
-
-        private int _borderThickness = 2;
-
-        public int BorderThickness
-        {
-            get => _borderThickness;
-            set
-            {
-                _borderThickness = value;
                 Application?.MarkDirty();
             }
         }

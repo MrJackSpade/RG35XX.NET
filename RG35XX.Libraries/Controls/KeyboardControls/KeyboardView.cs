@@ -1,6 +1,5 @@
 ﻿namespace RG35XX.Libraries.Controls.KeyboardControls
 {
-
     internal class KeyboardView
     {
         private readonly List<KeyboardRow> _rows = [];
@@ -8,11 +7,6 @@
         public IEnumerable<KeyboardButton> Buttons => _rows.SelectMany(r => r.Buttons.Values);
 
         public IReadOnlyList<KeyboardRow> Rows => _rows;
-
-        public KeyboardRow GetRow(char key)
-        {
-            return _rows.First(r => r.Buttons.ContainsKey(key));
-        }
 
         public void AddRow(KeyboardRow row)
         {
@@ -52,6 +46,11 @@
             }
 
             throw new KeyNotFoundException($"Key '{key}' not found in keyboard.");
+        }
+
+        public KeyboardRow GetRow(char key)
+        {
+            return _rows.First(r => r.Buttons.ContainsKey(key));
         }
 
         public void SetSelectable(bool value)

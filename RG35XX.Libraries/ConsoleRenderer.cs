@@ -124,7 +124,6 @@ namespace RG35XX.Libraries
 
         public void Write(char c, Color foreground, Color background)
         {
-
             if (c == '\r')
             {
                 return;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RG35XX.Core.Extensions
+﻿namespace RG35XX.Core.Extensions
 {
     public static class IReadOnlyListExtensions
     {
@@ -12,7 +6,7 @@ namespace RG35XX.Core.Extensions
         {
             int i = 0;
 
-            foreach (var item in list)
+            foreach (T? item in list)
             {
                 if (object.Equals(item, value))
                 {

@@ -16,7 +16,7 @@ namespace RG35XX.Libraries
 
         private readonly object _lock = new();
 
-        private readonly List<Page> _pages = new();
+        private readonly List<Page> _pages = [];
 
         private readonly AutoResetEvent _rendererWait = new(false);
 
@@ -153,7 +153,7 @@ namespace RG35XX.Libraries
                     {
                         toRender.Push(page);
 
-                        if(peekIndex >= _pages.Count)
+                        if (peekIndex >= _pages.Count)
                         {
                             break;
                         }

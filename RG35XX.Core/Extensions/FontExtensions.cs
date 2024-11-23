@@ -165,7 +165,7 @@ namespace RG35XX.Core.Extensions
                 bitmap.DrawBitmap(charmap, x, y);
                 x += charmap.Width;
 
-                if(x >= renderWidth)
+                if (x >= renderWidth)
                 {
                     x = 0;
                     y += charMaps.Max(x => x.Height);

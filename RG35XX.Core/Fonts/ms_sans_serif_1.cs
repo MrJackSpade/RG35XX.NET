@@ -3536,10 +3536,10 @@ namespace RG35XX.Core.Fonts
             ],
         };
 
+        public bool FixedWidth { get; }
+
         public int Height => 32;
 
         public int Width => 32;
-
-        public bool FixedWidth { get; }
     }
 }

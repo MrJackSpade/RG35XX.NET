@@ -116,18 +116,18 @@ namespace RG35XX.Libraries.Controls
 
                 if (IsSelected)
                 {
-                    bitmap.DrawBorder(this._borderThickness, HighlightColor);
+                    bitmap.DrawBorder(_borderThickness, HighlightColor);
                 }
                 else
                 {
-                    bitmap.DrawBorder(this._borderThickness, BorderHighlight, BorderShadow);
+                    bitmap.DrawBorder(_borderThickness, BorderHighlight, BorderShadow);
                 }
 
                 if (Text is not null)
                 {
-                    int spacing = this._padding + this._borderThickness;
+                    int spacing = _padding + _borderThickness;
 
-                    Bitmap textMap = Font.Render(Text, width - spacing * 2, height - spacing * 2, TextColor, BackgroundColor, FontSize);
+                    Bitmap textMap = Font.Render(Text, width - (spacing * 2), height - (spacing * 2), TextColor, BackgroundColor, FontSize);
 
                     bitmap.DrawBitmap(textMap, (width / 2) - (textMap.Width / 2), (height / 2) - (textMap.Height / 2));
                 }

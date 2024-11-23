@@ -1,6 +1,5 @@
 ﻿namespace RG35XX.Libraries.Controls.KeyboardControls
 {
-
     internal class KeyboardRow
     {
         public Dictionary<char, KeyboardButton> Buttons { get; set; } = [];
