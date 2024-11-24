@@ -13,6 +13,16 @@ namespace RG35XX.Libraries.Controls
             SelectionManager = new();
         }
 
+        public void SelectNext()
+        {
+            SelectionManager?.SelectNext(this);
+        }
+
+        public void SelectPrevious()
+        {
+            SelectionManager?.SelectPrevious(this);
+        }
+
         public void Close()
         {
             Application?.ClosePage(this);
@@ -27,7 +37,7 @@ namespace RG35XX.Libraries.Controls
         {
             if (key == GamepadKey.L1_DOWN)
             {
-                SelectionManager?.SelectLast(this);
+                SelectionManager?.SelectPrevious(this);
 
                 return;
             }

@@ -60,4 +60,17 @@
 
         LEFT_RIGHT_UP = 196608
     }
+
+    public static class GamepadKeyExtensions
+    {
+        public static bool IsAccept(this GamepadKey key)
+        {
+            return key is GamepadKey.A_DOWN or GamepadKey.START_DOWN;
+        }
+
+        public static bool IsCancel(this GamepadKey key)
+        {
+            return key is GamepadKey.B_DOWN or GamepadKey.MENU_DOWN;
+        }
+    }
 }

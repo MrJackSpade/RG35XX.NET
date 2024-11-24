@@ -56,6 +56,11 @@ namespace RG35XX.Libraries.Controls
 
                 bitmap.DrawTransparentBitmap(_alignment, image);
 
+                if (this.IsSelected)
+                {
+                    bitmap.DrawBorder(2, HighlightColor);
+                }
+
                 return bitmap;
             }
         }

@@ -16,7 +16,7 @@ namespace RG35XX.Libraries.Controls
 
         private IFont _font = ConsoleFont.ms_Sans_Serif_1;
 
-        private float _fontSize = 1;
+        private float _fontSize = 0.5f;
 
         private int _padding = 1;
 

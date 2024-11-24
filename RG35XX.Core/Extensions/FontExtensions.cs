@@ -3,7 +3,7 @@ using RG35XX.Core.Interfaces;
 
 namespace RG35XX.Core.Extensions
 {
-    public static class FontExtensions
+    public static partial class FontExtensions
     {
         public static Bitmap GetCharacterMap(this IFont font, char index, Color foreground, Color background, float size = 1, int padding = -1)
         {
@@ -104,7 +104,11 @@ namespace RG35XX.Core.Extensions
             foreach (char c in text)
             {
                 Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2);
-                charMaps.Add(charmap);
+
+                if (charmap != null)
+                {
+                    charMaps.Add(charmap);
+                }
             }
 
             int width = charMaps.Sum(c => c.Width);
@@ -126,29 +130,42 @@ namespace RG35XX.Core.Extensions
             int x = 0;
             int y = 0;
 
-            List<Bitmap> charMaps = [];
+            List<CharMapping> charMaps = [];
 
             foreach (char c in text)
             {
+                if(c == '\r')
+                {
+                    continue;
+                }
+
                 Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2)
                                  ?? font.GetCharacterMap('?', foregroundColor, backgroundColor, size, padding = 2)
                                  ?? font.GetCharacterMap(' ', foregroundColor, backgroundColor, size, padding = 2);
 
                 if (charmap != null)
                 {
-                    charMaps.Add(charmap);
+                    charMaps.Add(new CharMapping()
+                    {
+                        Bitmap = charmap,
+                        Character = c
+                    });
                 }
             }
 
             int renderWidth = Math.Min(width, charMaps.Sum(c => c.Width));
 
-            int renderHeight = 0;
+            int renderHeight = charMaps.Max(x => x.Height);
 
-            foreach (Bitmap charmap in charMaps)
+            for(int i = 0; i < charMaps.Count; i++)
             {
+                CharMapping charmap = charMaps[i];
+
+                bool isLast = i == charMaps.Count - 1;
+
                 x += charmap.Width;
 
-                if (x >= renderWidth)
+                if (!isLast && x >= renderWidth || charmap.Character == '\n')
                 {
                     x = 0;
                     renderHeight += charMaps.Max(x => x.Height);
@@ -160,12 +177,16 @@ namespace RG35XX.Core.Extensions
 
             Bitmap bitmap = new(renderWidth, renderHeight, backgroundColor);
 
-            foreach (Bitmap charmap in charMaps)
+            foreach (CharMapping charmap in charMaps)
             {
-                bitmap.DrawBitmap(charmap, x, y);
+                if (charmap.Character != '\n')
+                {
+                    bitmap.DrawBitmap(charmap.Bitmap, x, y);
+                }
+
                 x += charmap.Width;
 
-                if (x >= renderWidth)
+                if (x >= renderWidth || charmap.Character == '\n')
                 {
                     x = 0;
                     y += charMaps.Max(x => x.Height);

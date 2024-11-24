@@ -2,7 +2,7 @@
 
 namespace RG35XX.Libraries.Controls
 {
-    internal static class FormColors
+    public static class FormColors
     {
         public static Color ActiveBorder { get; set; } = Color.FromHex("#B4B4B4");
 

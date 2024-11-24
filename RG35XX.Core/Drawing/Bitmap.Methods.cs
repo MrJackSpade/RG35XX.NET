@@ -51,6 +51,18 @@
             // For each row in the area to copy
             for (int y = 0; y < copyHeight; y++)
             {
+                //We're below the image
+                if (y + offsetY >= Height)
+                {
+                    break;
+                }
+
+                //We're above the image
+                if(y + offsetY < 0)
+                {
+                    continue;
+                }
+
                 // Calculate source and destination indices
                 int sourceIndex = y * source.Width;
                 int destIndex = ((y + offsetY) * Width) + offsetX;

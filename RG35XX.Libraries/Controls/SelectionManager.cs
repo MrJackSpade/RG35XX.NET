@@ -48,7 +48,7 @@
             }
         }
 
-        internal void SelectLast(Page page)
+        internal void SelectPrevious(Page page)
         {
             List<Control> controlTree = this.GetSelectableChildren(page).ToList();
 
