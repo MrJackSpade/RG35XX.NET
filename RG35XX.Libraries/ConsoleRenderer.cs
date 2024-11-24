@@ -5,9 +5,9 @@ using Bitmap = RG35XX.Core.Drawing.Bitmap;
 
 namespace RG35XX.Libraries
 {
-    public class ConsoleRenderer(IFont font)
+    public class ConsoleRenderer
     {
-        private readonly IFont _font = font;
+        private readonly IFont _font;
 
         private CharData[,] _buffer = new CharData[0, 0];
 
@@ -15,16 +15,40 @@ namespace RG35XX.Libraries
 
         private int _cursorY;
 
+        public ConsoleRenderer(IFont font)
+        {
+            _font = font;
+            FrameBuffer = new FrameBuffer();
+        }
+
+        public ConsoleRenderer(IFont font, FrameBuffer? frameBuffer)
+        {
+            _font = font;
+            FrameBuffer = frameBuffer;
+        }
+
         public bool AutoFlush { get; set; } = true;
 
-        public FrameBuffer FrameBuffer { get; } = new();
+        public FrameBuffer? FrameBuffer { get; }
 
         public int Height { get; private set; }
 
         public int Width { get; private set; }
 
+        public bool Initialized { get; private set; }
+
+        private void EnsureInitialized()
+        {
+            if (!Initialized)
+            {
+                throw new System.InvalidOperationException("ConsoleRenderer has not been initialized.");
+            }
+        }
+
         public void Clear(bool flush = true)
         {
+            this.EnsureInitialized();
+
             _buffer = new CharData[Height, Width];
             _cursorX = 0;
             _cursorY = 0;
@@ -45,6 +69,8 @@ namespace RG35XX.Libraries
 
         public void ClearLine(bool flush = true)
         {
+            this.EnsureInitialized();
+
             _cursorX = 0;
 
             for (int x = 0; x < Width; x++)
@@ -60,14 +86,17 @@ namespace RG35XX.Libraries
 
         public void Flush()
         {
+            this.EnsureInitialized();
+
             Bitmap render = this.Render();
 
-            FrameBuffer.Draw(render, 0, 0);
+            FrameBuffer?.Draw(render, 0, 0);
         }
 
         public void Initialize(int width, int height)
         {
-            FrameBuffer.Initialize(width, height);
+            Initialized = true;
+            FrameBuffer?.Initialize(width, height);
             Width = width / _font.Width;
             Height = height / _font.Height;
             this.Clear(false);
@@ -75,6 +104,8 @@ namespace RG35XX.Libraries
 
         public Bitmap Render()
         {
+            this.EnsureInitialized();
+
             Bitmap toDraw = new(Width * _font.Width, Height * _font.Height);
 
             for (int y = 0; y < Height; y++)
@@ -108,22 +139,30 @@ namespace RG35XX.Libraries
 
         public void SetCursorPosition(int x, int y)
         {
+            this.EnsureInitialized();
+
             _cursorX = x;
             _cursorY = y;
         }
 
         public void Write(char c)
         {
+            this.EnsureInitialized();
+
             this.Write(c, Color.White, Color.Black);
         }
 
         public void Write(char c, Color foreground)
         {
+            this.EnsureInitialized();
+
             this.Write(c, foreground, Color.Black);
         }
 
         public void Write(char c, Color foreground, Color background)
         {
+            this.EnsureInitialized();
+
             if (c == '\r')
             {
                 return;
@@ -166,16 +205,22 @@ namespace RG35XX.Libraries
 
         public void Write(string text)
         {
+            this.EnsureInitialized();
+
             this.Write(text, Color.White, Color.Black);
         }
 
         public void Write(string text, Color foreground)
         {
+            this.EnsureInitialized();
+
             this.Write(text, foreground, Color.Black);
         }
 
         public void Write(string text, Color foreground, Color background)
         {
+            this.EnsureInitialized();
+
             foreach (char c in text)
             {
                 if (c == '\r')
@@ -221,21 +266,29 @@ namespace RG35XX.Libraries
 
         public void WriteLine(string text = "")
         {
+            this.EnsureInitialized();
+
             this.WriteLine(text, Color.White, Color.Black);
         }
 
         public void WriteLine(string? text, Color foreground)
         {
+            this.EnsureInitialized();
+
             this.Write(text + '\n', foreground, Color.Black);
         }
 
         public void WriteLine(string? text, Color foreground, Color background)
         {
+            this.EnsureInitialized();
+
             this.Write(text + '\n', foreground, background);
         }
 
         private void ScrollBufferUp()
         {
+            this.EnsureInitialized();
+
             // Move each line up by one
             for (int y = 1; y < Height; y++)
             {

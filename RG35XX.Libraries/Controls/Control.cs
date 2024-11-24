@@ -65,7 +65,6 @@ namespace RG35XX.Libraries.Controls
 
         internal SelectionManager? SelectionManager { get; set; }
 
-
         public event EventHandler<GamepadKey>? OnKeyPressed;
 
         public bool AddControl(Control control)
