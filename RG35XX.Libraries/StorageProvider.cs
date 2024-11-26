@@ -25,5 +25,15 @@ namespace RG35XX.Libraries
         {
             _storageProvider.Initialize();
         }
+
+        public bool IsSDMounted()
+        {
+            if (!Directory.Exists(SD))
+            {
+                return false;
+            }
+
+            return Directory.EnumerateDirectories(SD).Any();
+        }
     }
 }

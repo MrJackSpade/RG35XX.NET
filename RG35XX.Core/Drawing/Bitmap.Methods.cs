@@ -317,6 +317,11 @@
             {
                 for (int cx = 0; cx < bitmap.Width; cx++)
                 {
+                    if(!this.InRange(x + cx, y + cy))
+                    {
+                        continue;
+                    }
+
                     Color sourceColor = bitmap.GetPixel(cx, cy);
 
                     // Skip fully transparent pixels

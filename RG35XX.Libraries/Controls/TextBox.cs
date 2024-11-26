@@ -135,11 +135,14 @@ namespace RG35XX.Libraries.Controls
                 osk.OnClosing += (s, e) =>
                 {
                     _value = osk.Value;
+                    ValueChanged?.Invoke(this, _value);
                     Application?.MarkDirty();
                 };
             }
 
             base.OnKey(key);
         }
+
+        public event EventHandler<string?>? ValueChanged; 
     }
 }

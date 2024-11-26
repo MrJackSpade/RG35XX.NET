@@ -3,6 +3,7 @@ using RG35XX.Core.Extensions;
 using RG35XX.Core.GamePads;
 using RG35XX.Core.Interfaces;
 using RG35XX.Libraries.Controls;
+using RG35XX.Libraries.Dialogs;
 
 namespace RG35XX.Libraries
 {
@@ -24,7 +25,20 @@ namespace RG35XX.Libraries
 
         private readonly TaskCompletionSource<bool> _tcs;
 
+        public async Task<bool> WaitForClose()
+        {
+            return await _tcs.Task;
+        }
+
         private bool _running;
+
+        public void EnsureRunning()
+        {
+            if (!_running)
+            {
+                throw new InvalidOperationException("Application is not executing");
+            }
+        }
 
         public Application(int width, int height)
         {
@@ -51,6 +65,8 @@ namespace RG35XX.Libraries
 
         public void ClosePage()
         {
+            this.EnsureRunning();
+
             lock (_lock)
             {
                 if (_pages.Count > 0)
@@ -77,15 +93,13 @@ namespace RG35XX.Libraries
             }
         }
 
-        public Task Execute()
+        public void Execute()
         {
             _running = true;
 
             _renderingThread.Start();
 
             _gamepadThread.Start();
-
-            return _tcs.Task;
         }
 
         public void MarkDirty()
@@ -95,6 +109,8 @@ namespace RG35XX.Libraries
 
         public void OpenPage(Page page)
         {
+            this.EnsureRunning();
+
             lock (_lock)
             {
                 page.SetApplication(this);
@@ -106,6 +122,8 @@ namespace RG35XX.Libraries
 
         internal void ClosePage(Page page)
         {
+            this.EnsureRunning();
+
             lock (_lock)
             {
                 if (_pages.Count == 0 || !_pages.Peek().Equals(page))
@@ -119,6 +137,8 @@ namespace RG35XX.Libraries
 
         private void ReadGamePad(object? obj)
         {
+            this.EnsureRunning();
+
             do
             {
                 GamepadKey key = _gamePadReader.WaitForInput();
@@ -137,6 +157,8 @@ namespace RG35XX.Libraries
 
         private void Render()
         {
+            this.EnsureRunning();
+
             while (_running)
             {
                 _rendererWait.WaitOne();
@@ -172,6 +194,19 @@ namespace RG35XX.Libraries
                     _frameBuffer.Draw(bitmap, 0, 0);
                 }
             }
+        }
+
+        public async Task<DialogResult> ShowDialog(Dialog dialog)
+        {
+            this.EnsureRunning();
+
+            this.OpenPage(dialog);
+
+            DialogResult result = await dialog.Task;
+
+            this.ClosePage(dialog);
+
+            return result;
         }
     }
 }

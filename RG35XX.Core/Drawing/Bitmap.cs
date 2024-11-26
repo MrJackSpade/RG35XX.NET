@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace RG35XX.Core.Drawing
 {
@@ -42,7 +43,7 @@ namespace RG35XX.Core.Drawing
 
             if (stream == null)
             {
-                throw new ArgumentException("Resource not found", nameof(embeddedResourcePath));
+                throw new ArgumentException($"Resource not found: '{embeddedResourcePath}'", nameof(embeddedResourcePath));
             }
 
             // Load the stream into an image
@@ -79,6 +80,17 @@ namespace RG35XX.Core.Drawing
             {
                 Pixels[i] = color;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool InRange(int x, int y)
+        {
+            if (x < 0 || x >= Width || y < 0 || y >= Height)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public Color GetPixel(int x, int y)

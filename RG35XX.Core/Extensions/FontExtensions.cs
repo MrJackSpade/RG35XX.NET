@@ -130,15 +130,16 @@ namespace RG35XX.Core.Extensions
             int x = 0;
             int y = 0;
 
+            // Convert text into bitmap character mappings
             List<CharMapping> charMaps = [];
-
             foreach (char c in text)
             {
-                if(c == '\r')
+                if (c == '\r')
                 {
-                    continue;
+                    continue; // Skip carriage returns
                 }
 
+                // Get bitmap for character, fallback to '?' or space if not found
                 Bitmap charmap = font.GetCharacterMap(c, foregroundColor, backgroundColor, size, padding = 2)
                                  ?? font.GetCharacterMap('?', foregroundColor, backgroundColor, size, padding = 2)
                                  ?? font.GetCharacterMap(' ', foregroundColor, backgroundColor, size, padding = 2);
@@ -153,49 +154,122 @@ namespace RG35XX.Core.Extensions
                 }
             }
 
+            // Calculate required dimensions
             int renderWidth = Math.Min(width, charMaps.Sum(c => c.Width));
-
             int renderHeight = charMaps.Max(x => x.Height);
 
-            for(int i = 0; i < charMaps.Count; i++)
+            // First pass - calculate total height needed with word wrapping
+            x = 0;
+            for (int i = 0; i < charMaps.Count; i++)
             {
                 CharMapping charmap = charMaps[i];
-
                 bool isLast = i == charMaps.Count - 1;
 
-                x += charmap.Width;
+                if (charmap.Character == '\n')
+                {
+                    // Explicit newline
+                    x = 0;
+                    renderHeight += charMaps.Max(x => x.Height);
+                    continue;
+                }
 
-                if (!isLast && x >= renderWidth || charmap.Character == '\n')
+                // Skip leading spaces after a wrap
+                if (x == 0 && char.IsWhiteSpace(charmap.Character))
+                {
+                    continue;
+                }
+
+                // Look ahead to see if current word fits
+                int wordWidth = charmap.Width;
+                int lookAhead = i + 1;
+
+                // Calculate width of current word
+                while (lookAhead < charMaps.Count &&
+                       !char.IsWhiteSpace(charMaps[lookAhead].Character) &&
+                       charMaps[lookAhead].Character != '\n')
+                {
+                    wordWidth += charMaps[lookAhead].Width;
+                    lookAhead++;
+                }
+
+                // If we're at start of line, force word to break
+                if (x == 0 && wordWidth > renderWidth)
+                {
+                    x += charmap.Width;
+                }
+                // If word doesn't fit on current line, wrap to next line
+                else if ((x + wordWidth) > renderWidth && x > 0)
+                {
+                    x = charmap.Width;
+                    renderHeight += charMaps.Max(x => x.Height);
+                }
+                else
+                {
+                    x += charmap.Width;
+                }
+
+                // Wrap if we're at the end of line
+                if (!isLast && x >= renderWidth)
                 {
                     x = 0;
                     renderHeight += charMaps.Max(x => x.Height);
                 }
             }
 
-            x = 0;
-            y = 0;
-
+            // Create output bitmap
             Bitmap bitmap = new(renderWidth, renderHeight, backgroundColor);
 
-            foreach (CharMapping charmap in charMaps)
+            // Second pass - actually draw the characters
+            x = 0;
+            y = 0;
+            for (int i = 0; i < charMaps.Count; i++)
             {
-                if (charmap.Character != '\n')
+                CharMapping charmap = charMaps[i];
+
+                if (charmap.Character == '\n')
                 {
-                    bitmap.DrawBitmap(charmap.Bitmap, x, y);
+                    // Handle explicit newline
+                    x = 0;
+                    y += charMaps.Max(x => x.Height);
+                    continue;
                 }
 
-                x += charmap.Width;
+                // Look ahead to see if current word fits
+                int wordWidth = charmap.Width;
+                int lookAhead = i + 1;
 
-                if (x >= renderWidth || charmap.Character == '\n')
+                while (lookAhead < charMaps.Count &&
+                       !char.IsWhiteSpace(charMaps[lookAhead].Character) &&
+                       charMaps[lookAhead].Character != '\n')
+                {
+                    wordWidth += charMaps[lookAhead].Width;
+                    lookAhead++;
+                }
+
+                // Handle word wrapping
+                if (x + wordWidth > renderWidth && x > 0)
                 {
                     x = 0;
                     y += charMaps.Max(x => x.Height);
                 }
 
-                if (y >= height)
+                // Skip leading spaces after a wrap
+                if (x == 0 && char.IsWhiteSpace(charmap.Character))
+                {
+                    continue;
+                }
+
+                // Draw character if we're still within height bounds
+                if (y < height)
+                {
+                    bitmap.DrawBitmap(charmap.Bitmap, x, y);
+                }
+                else
                 {
                     break;
                 }
+
+                x += charmap.Width;
             }
 
             return bitmap;

@@ -5,13 +5,18 @@ namespace RG35XX.Libraries.Controls
 {
     public class Control : IDisposable
     {
-        protected readonly List<Control> _controls = [];
+        private readonly List<Control> _controls = [];
 
         protected readonly object _lock = new();
 
         private bool _isSelected;
 
         private Control? _parent;
+
+        public virtual void Clear()
+        {
+            _controls.Clear();
+        }
 
         public virtual Color BackgroundColor { get; set; } = FormColors.ControlLight;
 
@@ -67,7 +72,7 @@ namespace RG35XX.Libraries.Controls
 
         public event EventHandler<GamepadKey>? OnKeyPressed;
 
-        public bool AddControl(Control control)
+        public virtual bool AddControl(Control control)
         {
             lock (_lock)
             {
@@ -117,7 +122,7 @@ namespace RG35XX.Libraries.Controls
             OnKeyPressed?.Invoke(this, key);
         }
 
-        public bool RemoveControl(Control control)
+        public virtual bool RemoveControl(Control control)
         {
             lock (_lock)
             {

@@ -1,4 +1,5 @@
 ﻿using RG35XX.Core.Drawing;
+using RG35XX.Core.Extensions;
 using RG35XX.Core.GamePads;
 
 namespace RG35XX.Libraries.Controls
@@ -67,7 +68,7 @@ namespace RG35XX.Libraries.Controls
 
         public int SelectedIndex { get; set; } = -1;
 
-        public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _controls.Count ? _controls[SelectedIndex] : null;
+        public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < Controls.Count ? Controls[SelectedIndex] : null;
 
         public override bool TabThroughChildren { get; set; } = false;
 
@@ -89,7 +90,7 @@ namespace RG35XX.Libraries.Controls
             int itemsPerColumn = (int)(1 / ItemSize.Height);
             int itemsPerPage = itemsPerRow * itemsPerColumn;
 
-            if (_controls.Count > itemsPerPage)
+            if (Controls.Count > itemsPerPage)
             {
                 scrollBarWidth = (int)(width * _scrollBarWidth);
             }
@@ -109,7 +110,7 @@ namespace RG35XX.Libraries.Controls
                     bitmap.DrawBorder(2, HighlightColor);
                 }
 
-                int selectedIndex = _controls.IndexOf(SelectedItem);
+                int selectedIndex = Controls.IndexOf(SelectedItem);
 
                 // Adjust firstVisibleItemIndex to implement sliding window
                 if (selectedIndex < 0)
@@ -126,11 +127,11 @@ namespace RG35XX.Libraries.Controls
                     firstVisibleItemIndex += itemsPerRow;
                 }
 
-                int endItemIndex = Math.Min(_controls.Count, firstVisibleItemIndex + itemsPerPage);
+                int endItemIndex = Math.Min(Controls.Count, firstVisibleItemIndex + itemsPerPage);
 
                 for (int index = firstVisibleItemIndex; index < endItemIndex; index++)
                 {
-                    Control item = _controls[index];
+                    Control item = Controls[index];
 
                     int itemIndexInPage = index - firstVisibleItemIndex;
 
@@ -170,7 +171,7 @@ namespace RG35XX.Libraries.Controls
 
                     bitmap.DrawRectangle(scrollBarLeft, 0, scrollBarWidth, height, _scrollBarColor, FillStyle.Fill);
 
-                    int totalItems = _controls.Count;
+                    int totalItems = Controls.Count;
                     int scrollHandleHeight = (int)(height * (float)itemsPerPage / totalItems);
                     int scrollHandleY = (int)(height * (float)firstVisibleItemIndex / totalItems);
 
@@ -198,7 +199,7 @@ namespace RG35XX.Libraries.Controls
             }
             else if (key == GamepadKey.RIGHT)
             {
-                if (SelectedIndex < _controls.Count - 1)
+                if (SelectedIndex < Controls.Count - 1)
                 {
                     SelectedIndex++;
                     Application?.MarkDirty();
@@ -229,14 +230,14 @@ namespace RG35XX.Libraries.Controls
                     SelectedIndex = 0;
                     Application?.MarkDirty();
                 }
-                else if (SelectedIndex + itemsPerRow < _controls.Count)
+                else if (SelectedIndex + itemsPerRow < Controls.Count)
                 {
                     SelectedIndex += itemsPerRow;
                     Application?.MarkDirty();
                 }
-                else if (SelectedIndex < _controls.Count)
+                else if (SelectedIndex < Controls.Count)
                 {
-                    SelectedIndex = _controls.Count - 1;
+                    SelectedIndex = Controls.Count - 1;
                     Application?.MarkDirty();
                 }
             }

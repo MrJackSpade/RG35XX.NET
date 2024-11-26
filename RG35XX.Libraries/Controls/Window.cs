@@ -15,8 +15,6 @@ namespace RG35XX.Libraries.Controls
 
         private string _title = string.Empty;
 
-        private float _titleHeight = 0.05f;
-
         public int BorderThickness
         {
             get => _borderThickness;
@@ -59,21 +57,13 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        public float TitleHeight
-        {
-            get => _titleHeight;
-            set
-            {
-                _titleHeight = value;
-                Application?.MarkDirty();
-            }
-        }
-
         public override Bitmap Draw(int width, int height)
         {
             int widthMinusBorder = width - (2 * _borderThickness);
 
             int heightMinusBorder = height - (2 * _borderThickness);
+
+            int titleHeight = (int)(_font.Height * _fontSize);
 
             lock (_lock)
             {
@@ -84,7 +74,7 @@ namespace RG35XX.Libraries.Controls
                     bitmap.DrawBorder(_borderThickness, FormColors.ControlLightLight, FormColors.ControlDarkDark);
                 }
 
-                bitmap.DrawGradientRectangle(_borderThickness, _borderThickness, widthMinusBorder, (int)(heightMinusBorder * _titleHeight), FormColors.TitleBarStart, FormColors.TitleBarEnd, GradientDirection.LeftToRight);
+                bitmap.DrawGradientRectangle(_borderThickness, _borderThickness, widthMinusBorder, titleHeight, FormColors.TitleBarStart, FormColors.TitleBarEnd, GradientDirection.LeftToRight);
 
                 if (!string.IsNullOrEmpty(_title))
                 {
@@ -92,11 +82,11 @@ namespace RG35XX.Libraries.Controls
                     bitmap.DrawTransparentBitmap(_borderThickness, _borderThickness, title);
                 }
 
-                int clientHeight = heightMinusBorder - (int)(heightMinusBorder * _titleHeight);
+                int clientHeight = (int)(heightMinusBorder - titleHeight);
 
                 Bitmap client = base.Draw(widthMinusBorder, clientHeight);
 
-                bitmap.DrawTransparentBitmap(_borderThickness, (int)(heightMinusBorder * _titleHeight), client);
+                bitmap.DrawTransparentBitmap(_borderThickness, _borderThickness + titleHeight, client);
 
                 return bitmap;
             }

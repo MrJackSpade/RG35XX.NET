@@ -65,11 +65,13 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
-        public async Task TryLoadImageAsync(string url)
+        public async Task TryLoadImageAsync(string url, HttpClient? httpClient = null)
         {
+            httpClient ??= new HttpClient();
+
             try
             {
-                Stream imageStream = await new HttpClient().GetStreamAsync(url);
+                Stream imageStream = await httpClient.GetStreamAsync(url);
 
                 Image = new Bitmap(imageStream);
             }

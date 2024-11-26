@@ -1,4 +1,5 @@
 ﻿using RG35XX.Core.Drawing;
+using RG35XX.Core.Extensions;
 using RG35XX.Core.GamePads;
 
 namespace RG35XX.Libraries.Controls
@@ -18,7 +19,7 @@ namespace RG35XX.Libraries.Controls
 
         private Color _scrollBarColor = FormColors.ScrollBar;
 
-        private float _scrollBarWidth = 0.05f;
+        private float _scrollBarWidth = 0.03f;
 
         private int firstVisibleItemIndex = 0;
 
@@ -62,9 +63,15 @@ namespace RG35XX.Libraries.Controls
 
         public int SelectedIndex { get; set; } = -1;
 
-        public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _controls.Count ? _controls[SelectedIndex] : null;
+        public Control? SelectedItem => SelectedIndex >= 0 && SelectedIndex < Controls.Count ? Controls[SelectedIndex] : null;
 
         public override bool TabThroughChildren { get; set; } = false;
+
+        public override void Clear()
+        {
+            this.SelectedIndex = -1;
+            base.Clear();
+        }
 
         public override Bitmap Draw(int width, int height)
         {
@@ -74,7 +81,7 @@ namespace RG35XX.Libraries.Controls
 
             int scrollBarWidth = 0;
 
-            if (_controls.Count > itemsPerPage)
+            if (Controls.Count > itemsPerPage)
             {
                 scrollBarWidth = (int)(width * _scrollBarWidth);
             }
@@ -90,7 +97,7 @@ namespace RG35XX.Libraries.Controls
                     bitmap.DrawBorder(2, HighlightColor);
                 }
 
-                int selectedIndex = _controls.IndexOf(SelectedItem);
+                int selectedIndex = Controls.IndexOf(SelectedItem);
 
                 // Adjust firstVisibleItemIndex to implement sliding window
                 if (selectedIndex < 0)
@@ -108,18 +115,18 @@ namespace RG35XX.Libraries.Controls
 
                 int y = 0;
 
-                for (int i = firstVisibleItemIndex; i < _controls.Count && i < firstVisibleItemIndex + itemsPerPage; i++)
+                for (int i = firstVisibleItemIndex; i < Controls.Count && i < firstVisibleItemIndex + itemsPerPage; i++)
                 {
-                    Control item = _controls[i];
+                    Control item = Controls[i];
 
                     Bitmap itemBitmap = item.Draw(clientWidth - (_borderThickness * 2), itemHeight - (_borderThickness * 2));
 
-                    if (item == SelectedItem)
+                    if (i == SelectedIndex)
                     {
-                        itemBitmap.DrawBorder(_borderThickness, HighlightColor);
+                        bitmap.DrawRectangle(0, y + _borderThickness, itemBitmap.Width, itemBitmap.Height, HighlightColor, FillStyle.Fill);
                     }
 
-                    bitmap.DrawBitmap(itemBitmap, _borderThickness, y + _borderThickness);
+                    bitmap.DrawTransparentBitmap(_borderThickness, y + _borderThickness, itemBitmap);
 
                     y += itemHeight;
                 }
@@ -128,11 +135,11 @@ namespace RG35XX.Libraries.Controls
                 {
                     bitmap.DrawRectangle(clientWidth, 0, scrollBarWidth, height, _scrollBarColor, FillStyle.Fill);
 
-                    int scrollHandleHeight = (int)(height * (float)itemsPerPage / _controls.Count);
+                    int scrollHandleHeight = (int)(height * (float)itemsPerPage / Controls.Count);
 
                     Bitmap scrollHandle = new(scrollBarWidth, scrollHandleHeight, BackgroundColor);
 
-                    int scrollHandleY = (int)(height * (float)firstVisibleItemIndex / _controls.Count);
+                    int scrollHandleY = (int)(height * (float)firstVisibleItemIndex / Controls.Count);
 
                     scrollHandle.DrawBorder(1, FormColors.ControlLightLight, FormColors.ControlDarkDark);
 
@@ -152,7 +159,7 @@ namespace RG35XX.Libraries.Controls
             }
             else if (key == GamepadKey.DOWN)
             {
-                SelectedIndex = Math.Min(_controls.Count - 1, SelectedIndex + 1);
+                SelectedIndex = Math.Min(Controls.Count - 1, SelectedIndex + 1);
                 Application?.MarkDirty();
             }
             else if (key == GamepadKey.A_DOWN)
