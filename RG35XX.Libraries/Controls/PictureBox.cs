@@ -4,11 +4,11 @@ namespace RG35XX.Libraries.Controls
 {
     public class PictureBox : Control
     {
+        private Alignment _alignment = Alignment.MiddleCenter;
+
         private Bitmap? _image;
 
         private ScaleMode _scaleMode = ScaleMode.PreserveAspectRatio;
-
-        private Alignment _alignment = Alignment.MiddleCenter;
 
         public Alignment Alignment
         {
@@ -19,6 +19,7 @@ namespace RG35XX.Libraries.Controls
                 Application?.MarkDirty();
             }
         }
+
         public Bitmap? Image
         {
             get => _image;
@@ -52,11 +53,11 @@ namespace RG35XX.Libraries.Controls
 
                 Bitmap bitmap = new(width, height, BackgroundColor);
 
-                Bitmap image =  _image.Scale(width, height, ResizeMode.Average, _scaleMode);
+                Bitmap image = _image.Scale(width, height, ResizeMode.Average, _scaleMode);
 
                 bitmap.DrawTransparentBitmap(_alignment, image);
 
-                if (this.IsSelected)
+                if (IsSelected)
                 {
                     bitmap.DrawBorder(2, HighlightColor);
                 }

@@ -8,16 +8,6 @@ namespace RG35XX.Libraries.Controls
 {
     public class Button : Control
     {
-        public Button(string text)
-        {
-            _text = text;
-        }
-
-        public Button()
-        {
-
-        }
-
         private Color _borderHighlight = FormColors.ControlLightLight;
 
         private Color _borderShadow = FormColors.ControlDarkDark;
@@ -117,6 +107,15 @@ namespace RG35XX.Libraries.Controls
         }
 
         public event EventHandler? Click;
+
+        public Button(string text)
+        {
+            _text = text;
+        }
+
+        public Button()
+        {
+        }
 
         public override Bitmap Draw(int width, int height)
         {

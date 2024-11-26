@@ -25,20 +25,7 @@ namespace RG35XX.Libraries
 
         private readonly TaskCompletionSource<bool> _tcs;
 
-        public async Task<bool> WaitForClose()
-        {
-            return await _tcs.Task;
-        }
-
         private bool _running;
-
-        public void EnsureRunning()
-        {
-            if (!_running)
-            {
-                throw new InvalidOperationException("Application is not executing");
-            }
-        }
 
         public Application(int width, int height)
         {
@@ -93,6 +80,14 @@ namespace RG35XX.Libraries
             }
         }
 
+        public void EnsureRunning()
+        {
+            if (!_running)
+            {
+                throw new InvalidOperationException("Application is not executing");
+            }
+        }
+
         public void Execute()
         {
             _running = true;
@@ -120,6 +115,24 @@ namespace RG35XX.Libraries
             }
         }
 
+        public async Task<DialogResult> ShowDialog(Dialog dialog)
+        {
+            this.EnsureRunning();
+
+            this.OpenPage(dialog);
+
+            DialogResult result = await dialog.Task;
+
+            this.ClosePage(dialog);
+
+            return result;
+        }
+
+        public async Task<bool> WaitForClose()
+        {
+            return await _tcs.Task;
+        }
+
         internal void ClosePage(Page page)
         {
             this.EnsureRunning();
@@ -143,14 +156,11 @@ namespace RG35XX.Libraries
             {
                 GamepadKey key = _gamePadReader.WaitForInput();
 
-                lock (_lock)
+                if (_pages.Count > 0)
                 {
-                    if (_pages.Count > 0)
-                    {
-                        Page page = _pages.Peek();
+                    Page page = _pages.Peek();
 
-                        page.OnKey(key);
-                    }
+                    page.OnKey(key);
                 }
             } while (_running);
         }
@@ -163,50 +173,34 @@ namespace RG35XX.Libraries
             {
                 _rendererWait.WaitOne();
 
-                lock (_lock)
+                Stack<Page> toRender = new();
+
+                Page page = _pages.Peek();
+
+                int peekIndex = 1;
+
+                do
                 {
-                    Stack<Page> toRender = new();
+                    toRender.Push(page);
 
-                    Page page = _pages.Peek();
-
-                    int peekIndex = 1;
-
-                    do
+                    if (peekIndex >= _pages.Count)
                     {
-                        toRender.Push(page);
-
-                        if (peekIndex >= _pages.Count)
-                        {
-                            break;
-                        }
-
-                        page = _pages.Peek(peekIndex++);
-                    } while (page.HasTransparency);
-
-                    Bitmap bitmap = new(_frameBuffer.Width, _frameBuffer.Height);
-
-                    while (toRender.Count > 0)
-                    {
-                        page = toRender.Pop();
-                        bitmap.DrawBitmap(page.Draw(_frameBuffer.Width, _frameBuffer.Height), 0, 0);
+                        break;
                     }
 
-                    _frameBuffer.Draw(bitmap, 0, 0);
+                    page = _pages.Peek(peekIndex++);
+                } while (page.HasTransparency);
+
+                Bitmap bitmap = new(_frameBuffer.Width, _frameBuffer.Height);
+
+                while (toRender.Count > 0)
+                {
+                    page = toRender.Pop();
+                    bitmap.DrawBitmap(page.Draw(_frameBuffer.Width, _frameBuffer.Height), 0, 0);
                 }
+
+                _frameBuffer.Draw(bitmap, 0, 0);
             }
-        }
-
-        public async Task<DialogResult> ShowDialog(Dialog dialog)
-        {
-            this.EnsureRunning();
-
-            this.OpenPage(dialog);
-
-            DialogResult result = await dialog.Task;
-
-            this.ClosePage(dialog);
-
-            return result;
         }
     }
 }

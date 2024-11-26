@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RG35XX.Libraries
 {
@@ -15,6 +10,7 @@ namespace RG35XX.Libraries
         {
             Run("reboot -f");
         }
+
         private static void Run(string command)
         {
             // Properly escape the command for bash -c

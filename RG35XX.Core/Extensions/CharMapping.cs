@@ -6,13 +6,15 @@ namespace RG35XX.Core.Extensions
     public static partial class FontExtensions
     {
         [DebuggerDisplay("{Character}")]
-        class CharMapping
+        private class CharMapping
         {
+            public Bitmap Bitmap;
+
             public char Character;
 
-            public Bitmap Bitmap;
-            public int Width => Bitmap.Width;
             public int Height => Bitmap.Height;
+
+            public int Width => Bitmap.Width;
         }
     }
 }

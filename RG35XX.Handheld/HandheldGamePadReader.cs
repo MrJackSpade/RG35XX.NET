@@ -47,7 +47,10 @@ namespace RG35XX.Handheld
                         _keyBuffer.Enqueue(key);
                     }
                 } while (true);
-            });
+            })
+            {
+                Priority = ThreadPriority.AboveNormal
+            };
 
             _keyThread.Start();
         }
@@ -71,7 +74,9 @@ namespace RG35XX.Handheld
 
             try
             {
-                if (stream.Read(eventBuffer, 0, 8) != 8)
+                int read = stream.Read(eventBuffer, 0, 8);
+
+                if (read != 8)
                 {
                     return GamepadKey.None;
                 }
@@ -102,7 +107,9 @@ namespace RG35XX.Handheld
 
                 value |= input.Value;
 
-                return (GamepadKey)value;
+                GamepadKey gcKey = (GamepadKey)value;
+
+                return gcKey;
             }
             catch
             {

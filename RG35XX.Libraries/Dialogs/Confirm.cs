@@ -6,30 +6,13 @@ namespace RG35XX.Libraries.Dialogs
 {
     public class Confirm : Dialog
     {
-        private readonly Button _okButton;
-
         private readonly Button _cancelButton;
 
-        private readonly TextArea _textArea;
+        private readonly Button _okButton;
 
         private readonly string _text;
 
-        public override void OnKey(GamepadKey key)
-        {
-            if(key.IsCancel())
-            {
-                this.Cancel();
-                return;
-            }
-
-            if(key is GamepadKey.LEFT or GamepadKey.RIGHT or GamepadKey.UP or GamepadKey.DOWN)
-            {
-                SelectionManager?.SelectNext(this);
-                return;
-            }
-
-            base.OnKey(key);
-        }
+        private readonly TextArea _textArea;
 
         public Confirm(string title, string text = "") : base(title)
         {
@@ -66,7 +49,23 @@ namespace RG35XX.Libraries.Dialogs
             this.AddControl(_textArea);
             this.AddControl(_okButton);
             this.AddControl(_cancelButton);
+        }
 
+        public override void OnKey(GamepadKey key)
+        {
+            if (key.IsCancel())
+            {
+                this.Cancel();
+                return;
+            }
+
+            if (key is GamepadKey.LEFT or GamepadKey.RIGHT or GamepadKey.UP or GamepadKey.DOWN)
+            {
+                SelectionManager?.SelectNext(this);
+                return;
+            }
+
+            base.OnKey(key);
         }
     }
 }

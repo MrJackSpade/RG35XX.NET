@@ -11,33 +11,13 @@ namespace RG35XX.Libraries.Controls
 
         private float _fontSize = 0.5f;
 
-        private string? _text = null;
-
         private float _padding = 0.01f;
 
-        public float Padding
-        {
-            get => _padding;
-            set
-            {
-                _padding = value;
-                Application?.MarkDirty();
-            }
-        }
-
-        public override Color BackgroundColor { get; set; } = Color.White;
+        private string? _text = null;
 
         private Color _textColor = Color.Black;
 
-        public Color TextColor
-        {
-            get => _textColor;
-            set
-            {
-                _textColor = value;
-                Application?.MarkDirty();
-            }
-        }
+        public override Color BackgroundColor { get; set; } = Color.White;
 
         public IFont Font
         {
@@ -61,12 +41,32 @@ namespace RG35XX.Libraries.Controls
 
         public override bool IsSelectable { get; set; } = true;
 
+        public float Padding
+        {
+            get => _padding;
+            set
+            {
+                _padding = value;
+                Application?.MarkDirty();
+            }
+        }
+
         public string? Text
         {
             get => _text;
             set
             {
                 _text = value;
+                Application?.MarkDirty();
+            }
+        }
+
+        public Color TextColor
+        {
+            get => _textColor;
+            set
+            {
+                _textColor = value;
                 Application?.MarkDirty();
             }
         }
@@ -80,11 +80,11 @@ namespace RG35XX.Libraries.Controls
 
             if (!string.IsNullOrWhiteSpace(_text))
             {
-                Bitmap textmap = _font.Render(_text, width - paddingx * 2, height - paddingy * 2, _textColor, BackgroundColor, FontSize);
+                Bitmap textmap = _font.Render(_text, width - (paddingx * 2), height - (paddingy * 2), _textColor, BackgroundColor, FontSize);
                 bitmap.DrawBitmap(textmap, paddingx, paddingy);
             }
 
-            if(IsSelected)
+            if (IsSelected)
             {
                 bitmap.DrawBorder(2, HighlightColor);
             }

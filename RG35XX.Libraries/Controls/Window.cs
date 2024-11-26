@@ -82,7 +82,7 @@ namespace RG35XX.Libraries.Controls
                     bitmap.DrawTransparentBitmap(_borderThickness, _borderThickness, title);
                 }
 
-                int clientHeight = (int)(heightMinusBorder - titleHeight);
+                int clientHeight = heightMinusBorder - titleHeight;
 
                 Bitmap client = base.Draw(widthMinusBorder, clientHeight);
 

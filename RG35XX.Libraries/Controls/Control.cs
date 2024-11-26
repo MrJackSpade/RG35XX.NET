@@ -5,18 +5,13 @@ namespace RG35XX.Libraries.Controls
 {
     public class Control : IDisposable
     {
-        private readonly List<Control> _controls = [];
-
         protected readonly object _lock = new();
+
+        private readonly List<Control> _controls = [];
 
         private bool _isSelected;
 
         private Control? _parent;
-
-        public virtual void Clear()
-        {
-            _controls.Clear();
-        }
 
         public virtual Color BackgroundColor { get; set; } = FormColors.ControlLight;
 
@@ -88,6 +83,11 @@ namespace RG35XX.Libraries.Controls
 
                 return false;
             }
+        }
+
+        public virtual void Clear()
+        {
+            _controls.Clear();
         }
 
         public virtual void Dispose()

@@ -23,7 +23,7 @@ namespace RG35XX.Core.Extensions
 
             while (!keys.Contains(result))
             {
-                System.Threading.Thread.Sleep(delayMs);
+                Thread.Sleep(delayMs);
                 result = reader.ReadInput();
             }
 

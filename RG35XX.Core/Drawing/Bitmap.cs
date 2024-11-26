@@ -82,6 +82,16 @@ namespace RG35XX.Core.Drawing
             }
         }
 
+        public Color GetPixel(int x, int y)
+        {
+            if (x < 0 || x >= Width || y < 0 || y >= Height)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            return Pixels[(y * Width) + x];
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool InRange(int x, int y)
         {
@@ -91,16 +101,6 @@ namespace RG35XX.Core.Drawing
             }
 
             return true;
-        }
-
-        public Color GetPixel(int x, int y)
-        {
-            if (x < 0 || x >= Width || y < 0 || y >= Height)
-            {
-                throw new IndexOutOfRangeException();
-            }
-
-            return Pixels[(y * Width) + x];
         }
 
         public void SetPixel(int x, int y, Color color)

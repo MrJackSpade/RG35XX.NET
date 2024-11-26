@@ -7,9 +7,9 @@ namespace RG35XX.Libraries.Dialogs
     {
         private readonly Button _okButton;
 
-        private readonly TextArea _textArea;
-
         private readonly string _text;
+
+        private readonly TextArea _textArea;
 
         public Alert(string title, string text = "") : base(title)
         {

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Color = RG35XX.Core.Drawing.Color;
 
 namespace RG35XX.Core.Drawing
 {

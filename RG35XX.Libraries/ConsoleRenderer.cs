@@ -15,6 +15,16 @@ namespace RG35XX.Libraries
 
         private int _cursorY;
 
+        public bool AutoFlush { get; set; } = true;
+
+        public FrameBuffer? FrameBuffer { get; }
+
+        public int Height { get; private set; }
+
+        public bool Initialized { get; private set; }
+
+        public int Width { get; private set; }
+
         public ConsoleRenderer(IFont font)
         {
             _font = font;
@@ -25,24 +35,6 @@ namespace RG35XX.Libraries
         {
             _font = font;
             FrameBuffer = frameBuffer;
-        }
-
-        public bool AutoFlush { get; set; } = true;
-
-        public FrameBuffer? FrameBuffer { get; }
-
-        public int Height { get; private set; }
-
-        public int Width { get; private set; }
-
-        public bool Initialized { get; private set; }
-
-        private void EnsureInitialized()
-        {
-            if (!Initialized)
-            {
-                throw new System.InvalidOperationException("ConsoleRenderer has not been initialized.");
-            }
         }
 
         public void Clear(bool flush = true)
@@ -283,6 +275,14 @@ namespace RG35XX.Libraries
             this.EnsureInitialized();
 
             this.Write(text + '\n', foreground, background);
+        }
+
+        private void EnsureInitialized()
+        {
+            if (!Initialized)
+            {
+                throw new System.InvalidOperationException("ConsoleRenderer has not been initialized.");
+            }
         }
 
         private void ScrollBufferUp()

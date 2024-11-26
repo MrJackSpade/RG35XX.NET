@@ -69,7 +69,7 @@ namespace RG35XX.Libraries.Controls
 
         public override void Clear()
         {
-            this.SelectedIndex = -1;
+            SelectedIndex = -1;
             base.Clear();
         }
 

@@ -96,6 +96,8 @@ namespace RG35XX.Libraries.Controls
             }
         }
 
+        public event EventHandler<string?>? ValueChanged;
+
         public override Bitmap Draw(int width, int height)
         {
             lock (_lock)
@@ -142,7 +144,5 @@ namespace RG35XX.Libraries.Controls
 
             base.OnKey(key);
         }
-
-        public event EventHandler<string?>? ValueChanged; 
     }
 }

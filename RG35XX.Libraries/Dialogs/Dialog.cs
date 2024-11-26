@@ -1,5 +1,4 @@
-﻿using RG35XX.Core.Drawing;
-using RG35XX.Libraries.Controls;
+﻿using RG35XX.Libraries.Controls;
 
 namespace RG35XX.Libraries.Dialogs
 {
