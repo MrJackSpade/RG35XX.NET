@@ -107,6 +107,9 @@ namespace RG35XX.Libraries
 
         public bool IsDmenuLnPatched()
         {
+#if DEBUG
+            return true;
+#endif
             string contents = File.ReadAllText("/mnt/vendor/ctrl/dmenu_ln");
 
             return contents.Contains("#PATCHED NEXT EXECUTION");

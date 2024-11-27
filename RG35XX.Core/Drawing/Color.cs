@@ -140,6 +140,7 @@ namespace RG35XX.Core.Drawing
         }
 
         public static Color Grey => new(128, 128, 128);
+        public static Color Gray => new(128, 128, 128);
 
         public static Color FromArgb(byte a, byte r, byte g, byte b)
         {

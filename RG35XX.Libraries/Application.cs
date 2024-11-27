@@ -90,6 +90,11 @@ namespace RG35XX.Libraries
 
         public void Execute()
         {
+            if (_running)
+            {
+                throw new InvalidOperationException("Application is already running");
+            }
+
             _running = true;
 
             _renderingThread.Start();
@@ -176,6 +181,11 @@ namespace RG35XX.Libraries
                 Stack<Page> toRender = new();
 
                 Page page = _pages.Peek();
+
+                if(page is null)
+                {
+                    continue;
+                }
 
                 int peekIndex = 1;
 

@@ -11,9 +11,11 @@ namespace RG35XX.Libraries.Dialogs
 
         private readonly TextArea _textArea;
 
-        public Alert(string title, string text = "") : base(title)
+        public Alert(string title, string text = "", bool showOk = true) : base(title)
         {
             _text = text;
+
+            float textAreaHeight = showOk ? 0.6f : 0.8f;
 
             _textArea = new TextArea
             {
@@ -22,21 +24,25 @@ namespace RG35XX.Libraries.Dialogs
                 Padding = 0.05f,
                 BackgroundColor = BackgroundColor,
                 TextColor = Color.Black,
-                Bounds = new Bounds(0.1f, 0.1f, 0.8f, 0.6f),
+                Bounds = new Bounds(0.1f, 0.1f, 0.8f, textAreaHeight),
                 IsSelectable = false
             };
 
-            _okButton = new Button
-            {
-                Text = "OK",
-                Bounds = new Bounds(0.1f, 0.7f, 0.8f, 0.2f),
-                BackgroundColor = BackgroundColor
-            };
-
-            _okButton.Click += (sender, e) => this.Ok();
-
             this.AddControl(_textArea);
-            this.AddControl(_okButton);
+
+            if (showOk)
+            {
+                _okButton = new Button
+                {
+                    Text = "OK",
+                    Bounds = new Bounds(0.1f, 0.7f, 0.8f, 0.2f),
+                    BackgroundColor = BackgroundColor
+                };
+
+                _okButton.Click += (sender, e) => this.Ok();
+
+                this.AddControl(_okButton);
+            }
         }
     }
 }
