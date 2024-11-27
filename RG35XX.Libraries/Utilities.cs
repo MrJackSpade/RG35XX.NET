@@ -11,7 +11,7 @@ namespace RG35XX.Libraries
             Run("reboot -f");
         }
 
-        private static void Run(string command)
+        internal static void Run(string command)
         {
             // Properly escape the command for bash -c
             string escapedCommand = command
@@ -52,10 +52,10 @@ namespace RG35XX.Libraries
             }
         }
 
-        public static async Task CorrectSystemTime()
+        public static async Task<bool> CorrectSystemTime()
         {
 #if DEBUG
-            return;
+            return false;
 #endif
 
             int maxRetries = 3;
@@ -84,11 +84,11 @@ namespace RG35XX.Libraries
                     {
                         string dateCommand = response.Headers.Date.Value.UtcDateTime.ToString("MMddHHmmyyyy.ss");
                         Run($"date {dateCommand}");
-                        return; // Success - exit method
+                        return true; // Success - exit method
                     }
                     else
                     {
-                        throw new Exception("No date header received from server");
+                        return false; // No date header - exit method
                     }
                 }
                 catch (Exception ex)
@@ -101,10 +101,12 @@ namespace RG35XX.Libraries
                     }
                     else
                     {
-                        throw new Exception($"Failed to set system time: {ex.Message}", ex);
+                        return false;
                     }
                 }
             }
+
+            return false;
         }
     }
 }
