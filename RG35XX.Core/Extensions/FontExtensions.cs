@@ -158,10 +158,15 @@ namespace RG35XX.Core.Extensions
             int renderWidth = Math.Min(width, charMaps.Sum(c => c.Width));
             int renderHeight = charMaps.Max(x => x.Height);
 
+            bool lastWhiteSpace = false;
+            bool firstNewLine = false;
+
             // First pass - calculate total height needed with word wrapping
             x = 0;
             for (int i = 0; i < charMaps.Count; i++)
             {
+                firstNewLine = x == 0;
+
                 CharMapping charmap = charMaps[i];
                 bool isLast = i == charMaps.Count - 1;
 
@@ -170,12 +175,14 @@ namespace RG35XX.Core.Extensions
                     // Explicit newline
                     x = 0;
                     renderHeight += charMaps.Max(x => x.Height);
+                    lastWhiteSpace = true;
                     continue;
                 }
 
                 // Skip leading spaces after a wrap
-                if (x == 0 && char.IsWhiteSpace(charmap.Character))
+                if (firstNewLine && char.IsWhiteSpace(charmap.Character))
                 {
+                    lastWhiteSpace = true;
                     continue;
                 }
 
@@ -192,13 +199,10 @@ namespace RG35XX.Core.Extensions
                     lookAhead++;
                 }
 
-                // If we're at start of line, force word to break
-                if (x == 0 && wordWidth > renderWidth)
-                {
-                    x += charmap.Width;
-                }
                 // If word doesn't fit on current line, wrap to next line
-                else if ((x + wordWidth) > renderWidth && x > 0)
+                if (!firstNewLine && 
+                    lastWhiteSpace && 
+                    (x + wordWidth) > renderWidth && x > 0)
                 {
                     x = charmap.Width;
                     renderHeight += charMaps.Max(x => x.Height);
@@ -214,6 +218,8 @@ namespace RG35XX.Core.Extensions
                     x = 0;
                     renderHeight += charMaps.Max(x => x.Height);
                 }
+
+                lastWhiteSpace = char.IsWhiteSpace(charmap.Character);
             }
 
             // Create output bitmap
@@ -222,8 +228,12 @@ namespace RG35XX.Core.Extensions
             // Second pass - actually draw the characters
             x = 0;
             y = 0;
+            lastWhiteSpace = false;
+            firstNewLine = false;
             for (int i = 0; i < charMaps.Count; i++)
             {
+                firstNewLine = x == 0;
+
                 CharMapping charmap = charMaps[i];
 
                 if (charmap.Character == '\n')
@@ -231,6 +241,7 @@ namespace RG35XX.Core.Extensions
                     // Handle explicit newline
                     x = 0;
                     y += charMaps.Max(x => x.Height);
+                    lastWhiteSpace = true;
                     continue;
                 }
 
@@ -247,7 +258,9 @@ namespace RG35XX.Core.Extensions
                 }
 
                 // Handle word wrapping
-                if (x + wordWidth > renderWidth && x > 0)
+                if ((!firstNewLine && lastWhiteSpace && x + wordWidth > renderWidth)
+                    || x >= renderWidth
+                    )
                 {
                     x = 0;
                     y += charMaps.Max(x => x.Height);
@@ -270,6 +283,8 @@ namespace RG35XX.Core.Extensions
                 }
 
                 x += charmap.Width;
+
+                lastWhiteSpace = char.IsWhiteSpace(charmap.Character);
             }
 
             return bitmap;
